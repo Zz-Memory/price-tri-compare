@@ -145,7 +145,7 @@ pnpm install zustand
 pnpm install axios
 
 # 数据模拟（由于项目完全使用Mock.js，即使在生产环境也需要）
-pnpm install mockjs
+pnpm install vite-plugin-mock
 
 # JWT前端鉴权
 pnpm install jsonwebtoken  # 用于生成和验证JWT令牌
@@ -157,7 +157,7 @@ pnpm install recharts
 pnpm install tailwindcss @tailwindcss/vite
 
 # 一次安装
-pnpm install react-router-dom react-vant zustand axios mockjs jsonwebtoken recharts tailwindcss @tailwindcss/vite
+pnpm install react-router-dom react-vant zustand axios vite-plugin-mock jsonwebtoken recharts tailwindcss @tailwindcss/vite
 
 ```
 
