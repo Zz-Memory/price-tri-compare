@@ -92,7 +92,7 @@ src/
 - 分类筛选组件
 - 批量操作组件
 
-### 我的 (ProfilePage)
+### 我的 (UserPage)
 - 商品收藏入口
 - 用户信息组件
   - 用户头像
@@ -138,6 +138,9 @@ pnpm install react-router-dom
 # UI组件库
 pnpm install react-vant
 
+# 图标
+pnpm install @react-vant/icons
+
 # 状态管理
 pnpm install zustand
 
@@ -157,7 +160,7 @@ pnpm install recharts
 pnpm install tailwindcss @tailwindcss/vite
 
 # 一次安装
-pnpm install react-router-dom react-vant zustand axios vite-plugin-mock jsonwebtoken recharts tailwindcss @tailwindcss/vite
+pnpm install react-router-dom react-vant zustand axios vite-plugin-mock jsonwebtoken recharts tailwindcss @tailwindcss/vite @react-vant/icons
 
 ```
 

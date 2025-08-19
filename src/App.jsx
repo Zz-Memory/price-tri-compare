@@ -18,7 +18,7 @@ const Home = lazy(() => import('@/pages/Home'))
 const SavingTips = lazy(() => import('@/pages/SavingTips'))
 const AiAssistant = lazy(() => import('@/pages/AiAssistant'))
 const Favorites = lazy(() => import('@/pages/Favorites'))
-const Profile = lazy(() => import('@/pages/Profile'))
+const User = lazy(() => import('@/pages/User'))
 const SearchBox = lazy(() => import('@/components/SearchBox'))
 
 function App() {
@@ -35,7 +35,7 @@ function App() {
             <Route path="/tips" element={<SavingTips />} />
             <Route path="/assistant" element={<AiAssistant />} />
             <Route path="/favorites" element={<Favorites />} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/user" element={<User />} />
           </Route>
         </Routes>
 
