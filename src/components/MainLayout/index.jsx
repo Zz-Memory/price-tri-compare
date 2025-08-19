@@ -32,8 +32,11 @@ const MainLayout = () => {
 
     // 根据当前路径设置活动标签
     useEffect(() => {
+        // 获取当前路径
         const currentPath = location.pathname;
+        // 找到第一个匹配的tab
         const index = tabs.findIndex(tab => currentPath.startsWith(tab.path));
+        // 如果找到则激活该标签
         if (index !== -1) {
             setActiveTab(index);
         }
@@ -46,7 +49,7 @@ const MainLayout = () => {
     };
 
     return(
-        <div>
+        <>
             <div>
                 <Outlet />
             </div>
@@ -57,7 +60,7 @@ const MainLayout = () => {
                     </Tabbar.Item>
                 ))}
             </Tabbar>
-        </div>
+        </>
     )
 }
 
