@@ -37,10 +37,8 @@ function App() {
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/user" element={<User />} />
           </Route>
-        </Routes>
 
         {/* 不带TabBar的布局 */}
-        <Routes>
           <Route element={<BlankLayout />}>
             <Route path="/search" element={<SearchBox />} />
           </Route>

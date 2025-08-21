@@ -68,7 +68,6 @@ src/
 - 导航菜单组件
 - 商品推荐列表组件
   - 支持筛选功能（可按照平台和商品种类进行筛选）
-  - 分为列表（详细信息）和瀑布流（简略信息）两种展示模式
 - 底部导航栏组件（首页、省钱攻略、AI助手、收藏、我的）
 
 ### 搜索页面 (SearchPage)
@@ -83,6 +82,7 @@ src/
 
 ### 省钱攻略页面 (SavingTipsPage)
 - 省钱技巧文章组件
+- 以瀑布流的形式展示文章
 
 ### AI助手页面 (AIAssistantPage)
 - 智能对话组件
@@ -148,6 +148,7 @@ pnpm install zustand
 pnpm install axios
 
 # 数据模拟（由于项目完全使用Mock.js，即使在生产环境也需要）
+pnpm install mockjs
 pnpm install vite-plugin-mock
 
 # JWT前端鉴权
@@ -160,7 +161,7 @@ pnpm install recharts
 pnpm install tailwindcss @tailwindcss/vite
 
 # 一次安装
-pnpm install react-router-dom react-vant zustand axios vite-plugin-mock jsonwebtoken recharts tailwindcss @tailwindcss/vite @react-vant/icons
+pnpm install react-router-dom react-vant zustand axios vite-plugin-mock mockjs jsonwebtoken recharts tailwindcss @tailwindcss/vite @react-vant/icons
 
 ```
 
@@ -168,6 +169,6 @@ pnpm install react-router-dom react-vant zustand axios vite-plugin-mock jsonwebt
 ### 开发依赖
 ```bash
 # 移动端适配
-pnpm install -D postcss-px-to-viewport
+pnpm install -D postcss-px-to-viewport-8-plugin
 
 ```
