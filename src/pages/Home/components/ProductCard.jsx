@@ -1,3 +1,8 @@
+import {
+  ThumbCircleO,
+  CommentCircleO
+} from '@react-vant/icons'
+
 /**
  * ProductCard 商品卡片（展示组件）
  * - 负责渲染封面、角标、标题/副标题、标签、价格、来源时间、互动数据（评论/点赞）
@@ -109,20 +114,15 @@ const ProductCard = ({
 
             {/* 互动数据（图标 + 数字） */}
             <div className="flex items-center space-x-2">
-              {/* 评论图标（纯 SVG，无依赖） */}
+              {/* 评论图标 */}
               <span className="text-gray-400" aria-label="comments">
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 15a4 4 0 0 1-4 4H7l-4 4V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"></path>
-                </svg>
+                <CommentCircleO  />
               </span>
               <span>{stats?.comments ?? 0}</span>
 
               {/* 点赞图标 */}
               <span className="text-gray-400" aria-label="likes">
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M14 9V5a3 3 0 0 0-3-3 9 9 0 0 0-9 9"></path>
-                  <path d="M9 22V12h12v5a5 5 0 0 1-5 5z"></path>
-                </svg>
+                <ThumbCircleO />
               </span>
               <span>{stats?.likes ?? 0}</span>
             </div>
