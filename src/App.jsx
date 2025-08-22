@@ -20,6 +20,7 @@ const AiAssistant = lazy(() => import('@/pages/AiAssistant'))
 const Favorites = lazy(() => import('@/pages/Favorites'))
 const User = lazy(() => import('@/pages/User'))
 const SearchBox = lazy(() => import('@/components/SearchBox'))
+const ProductDetails = lazy(() => import('@/pages/ProductDetails'))
 
 function App() {
 
@@ -41,6 +42,7 @@ function App() {
         {/* 不带TabBar的布局 */}
           <Route element={<BlankLayout />}>
             <Route path="/search" element={<SearchBox />} />
+            <Route path="/product/:id" element={<ProductDetails />} />
           </Route>
         </Routes>
       </Suspense>

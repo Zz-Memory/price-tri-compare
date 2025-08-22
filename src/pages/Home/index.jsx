@@ -7,6 +7,7 @@ import QuickActions from "@/pages/Home/components/QuickActions";
 import PlatformTabs from "@/pages/Home/components/PlatformTabs";
 import CategoryChips from "@/pages/Home/components/CategoryChips";
 import ProductCard from "@/pages/Home/components/ProductCard";
+import { Link } from 'react-router-dom';
 
 /**
  * 首页容器（纯渲染）
@@ -108,18 +109,24 @@ const Home = () => {
         {!loading &&
           !errMsg &&
           products.map((p) => (
-            <ProductCard
+            <Link
               key={p.id}
-              cover={p.cover}
-              badge={p.badge}
-              title={p.title}
-              subtitle={p.subtitle}
-              tag={p.tag}
-              price={{ amount: `${p.currentPrice}元` }}
-              last7dPrices={p.last7dPrices}
-              meta={p.meta}
-              stats={p.stats}
-            />
+              to={`/product/${p.id}`}
+              state={{ item: p }}
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              <ProductCard
+                cover={p.cover}
+                badge={p.badge}
+                title={p.title}
+                subtitle={p.subtitle}
+                tag={p.tag}
+                price={{ amount: `${p.currentPrice}元` }}
+                last7dPrices={p.last7dPrices}
+                meta={p.meta}
+                stats={p.stats}
+              />
+            </Link>
           ))}
 
         {/* 底部哨兵 + 状态提示（仅在非首屏加载时展示） */}

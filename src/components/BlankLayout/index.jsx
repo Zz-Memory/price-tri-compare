@@ -4,7 +4,6 @@ import {
 const BlankLayout = () => {
     return (
         <>
-            <h1>Blank LayOut</h1>
             <Outlet />
         </>
     )

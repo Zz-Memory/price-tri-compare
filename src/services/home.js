@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "@/services/config";
 
 /**
  * 获取首页推荐商品列表
@@ -14,7 +14,7 @@ export async function fetchHomeRecommendations({
   page = 1,
   pageSize = 10,
 }) {
-  const { data } = await axios.get("/api/home/recommendations", {
+  const { data } = await axios.get("/home/recommendations", {
     params: { platform, category, page, pageSize },
   });
   return data?.data?.list ?? [];
