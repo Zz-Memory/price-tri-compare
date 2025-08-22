@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Skeleton } from "react-vant";
 import useTitle from "@/hooks/useTitle";
 import useHomeFeed from "@/hooks/useHomeFeed";
@@ -10,6 +11,7 @@ import ProductCard from "@/pages/Home/components/ProductCard";
 /**
  * 首页容器（纯渲染）
  * - 数据与状态通过 useHomeFeed Hook 提供
+ * - 使用 IntersectionObserver 实现列表的“无限下拉”加载更多
  */
 const Home = () => {
   useTitle("首页");
@@ -24,8 +26,31 @@ const Home = () => {
     setActiveCategory,
     products,
     loading,
-    errMsg
+    loadingMore,
+    hasMore,
+    errMsg,
+    loadMore,
   } = useHomeFeed();
+
+  // 底部哨兵，用于触发加载更多
+  const loadMoreRef = useRef(null);
+  useEffect(() => {
+    if (!hasMore) return; // 没有更多则不再监听
+    const el = loadMoreRef.current;
+    if (!el) return;
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first && first.isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [hasMore, loadMore]);
 
   return (
     <div className="max-w-md mx-auto bg-gray-100 min-h-screen pb-16">
@@ -56,7 +81,7 @@ const Home = () => {
           onChange={setActiveCategory}
         />
 
-        {/* 加载骨架屏 */}
+        {/* 加载骨架屏（首屏/切换筛选时） */}
         {loading && (
           <div>
             {[...Array(6)].map((_, i) => (
@@ -96,6 +121,16 @@ const Home = () => {
               stats={p.stats}
             />
           ))}
+
+        {/* 底部哨兵 + 状态提示（仅在非首屏加载时展示） */}
+        {!loading && !errMsg && (
+          <>
+            {hasMore && <div ref={loadMoreRef} className="h-6" />}
+            <div className="text-center text-xs text-gray-400 py-3">
+              {loadingMore ? "加载中..." : hasMore ? "" : products.length ? "已无更多" : ""}
+            </div>
+          </>
+        )}
       </main>
     </div>
   );
