@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import useTitle from "@/hooks/useTitle";
 import HomeHeader from "./components/HomeHeader";
 import QuickActions from "./components/QuickActions";
@@ -6,6 +7,11 @@ import PlatformTabs from "./components/PlatformTabs";
 import CategoryChips from "./components/CategoryChips";
 import ProductCard from "./components/ProductCard";
 
+/**
+ * 平台 Tab 数据（受控）
+ * - key：传给接口的 platform 参数
+ * - label：展示名称
+ */
 const platformItems = [
   { key: "douyin", label: "抖音商城" },
   { key: "pdd", label: "拼多多" },
@@ -15,6 +21,11 @@ const platformItems = [
   { key: "kuaishou", label: "快手商城" },
 ];
 
+/**
+ * 分类 Chips 数据（受控）
+ * - key：传给接口的 category 参数
+ * - label：展示名称
+ */
 const categoryItems = [
   { key: "pc", label: "电脑" },
   { key: "phone", label: "手机" },
@@ -25,49 +36,76 @@ const categoryItems = [
   { key: "home", label: "居家" },
 ];
 
-const demoProducts = [
-  {
-    id: "p1",
-    cover:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuB_zRzeIZvSHo2VbM4VMMhKR8t3tHRR6MKHgdfgpZc9r24kQNPVCr1F0afUpomGEVffMEFkbG73dmwaTWHn08xKwAupHzK_tv5ER7dYlIQfaxv2TCRytV0zUPyYimhk4ZQ9EsBOntiabMAX6yOapLjXimNNhSfqOo0_OEszgrFOC1OySlNudV0vMT4RvDNy56nyUj8Bamnr5EX5yXuHwuu-FlP1Iq9UHUror8Jo_C4N0DpCa981IUWuGd2aIGP-ZlCXIZqpUcsbfg4",
-    badge: { text: "低于双11", color: "bg-red-500" },
-    title:
-      "一加 平板Pro 平板电脑 高通第三代骁龙 8 12.1英寸 8GB+128GB 深空灰",
-    subtitle: "慢慢买补贴1.4元",
-    price: { amount: "1751.85元" },
-    meta: { source: "京东自营", time: "22:03" },
-    stats: { comments: 0, likes: 29 },
-  },
-  {
-    id: "p2",
-    cover:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDEKcedclE3jqFohF6mZx7zKeSDqCZwxiLjX0rI5mOPK8adxPb4oFgG6Ft1XJ3HNdf4nYzfC4e7TS0t1k7s2pMioIKGDbsFFs-M9TLo7FHMxUsjQURXQNqq98brfU51BbUK2HdT798cOimQHOoGyHvl7AVOdXgJE6SKuDXmkRCFP_Q1Du-Rc0rjUypMUQ2l1iKgVu95IIEJ8OXHFXj9uvU9aNXTmPqSWw8RA62HJpwQsLh9uhvU8fjZUnLIrC5zln0b1XEvB05vScQ",
-    badge: { text: "历史新低", color: "bg-blue-500" },
-    title: "iQOO Neo10 Pro+ 手机 超级像素 12+256G",
-    tag: { text: "政府补贴", bg: "bg-yellow-100", textColor: "text-yellow-700" },
-    price: { amount: "2116.65元", note: "(需领券,晒图...)" },
-    meta: { source: "京东商城", time: "10:39" },
-    stats: { comments: 2, likes: 549 },
-  },
-];
-
+/**
+ * 首页容器
+ * - 管理平台/分类选中态（受控）
+ * - 根据选中态请求 Mock 接口获取推荐商品数据
+ * - 展示加载/错误状态与商品卡片
+ */
 const Home = () => {
   useTitle("首页");
 
+  // 平台与分类当前选中项（受控）
   const [activePlatform, setActivePlatform] = useState(platformItems[0].key);
   const [activeCategory, setActiveCategory] = useState(categoryItems[0].key);
 
+  // 列表数据与状态
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
+
+  /**
+   * 监听平台/分类变化，请求推荐列表
+   * - 接口：GET /api/home/recommendations
+   * - 参数：platform / category / page / pageSize
+   * - 注意：通过 stopped 标志避免组件卸载后的状态更新
+   */
+  useEffect(() => {
+    let stopped = false;
+    async function load() {
+      setLoading(true);
+      setErrMsg("");
+      try {
+        const { data } = await axios.get("/api/home/recommendations", {
+          params: {
+            platform: activePlatform,
+            category: activeCategory,
+            page: 1,
+            pageSize: 10,
+          },
+        });
+        if (stopped) return;
+        const list = data?.data?.list ?? [];
+        setProducts(list);
+      } catch (e) {
+        if (stopped) return;
+        setErrMsg("数据加载失败");
+        setProducts([]);
+      } finally {
+        if (!stopped) setLoading(false);
+      }
+    }
+    load();
+    return () => {
+      stopped = true;
+    };
+  }, [activePlatform, activeCategory]);
+
   return (
     <div className="max-w-md mx-auto bg-gray-100 min-h-screen pb-16">
+      {/* 顶部：标题 + 搜索框 */}
       <header className="p-3 bg-white">
         <HomeHeader />
       </header>
 
+      {/* 快捷功能入口（5个圆形入口） */}
       <section className="bg-white p-3">
         <QuickActions />
       </section>
 
+      {/* 主体区域：平台 Tabs、分类 Chips、列表 */}
       <main className="bg-gray-100 p-3">
+        {/* 平台 Tabs（受控） */}
         <PlatformTabs
           items={platformItems}
           active={activePlatform}
@@ -75,25 +113,37 @@ const Home = () => {
           onMenuClick={() => {}}
         />
 
+        {/* 分类 Chips（受控） */}
         <CategoryChips
           items={categoryItems}
           active={activeCategory}
           onChange={setActiveCategory}
         />
 
-        {demoProducts.map((p) => (
-          <ProductCard
-            key={p.id}
-            cover={p.cover}
-            badge={p.badge}
-            title={p.title}
-            subtitle={p.subtitle}
-            tag={p.tag}
-            price={p.price}
-            meta={p.meta}
-            stats={p.stats}
-          />
-        ))}
+        {/* 加载/错误提示 */}
+        {loading && (
+          <div className="text-center text-sm text-gray-500 py-6">加载中...</div>
+        )}
+        {errMsg && !loading && (
+          <div className="text-center text-sm text-red-500 py-6">{errMsg}</div>
+        )}
+
+        {/* 商品列表（将接口的 currentPrice 映射为展示用字符串） */}
+        {!loading &&
+          !errMsg &&
+          products.map((p) => (
+            <ProductCard
+              key={p.id}
+              cover={p.cover}
+              badge={p.badge}
+              title={p.title}
+              subtitle={p.subtitle}
+              tag={p.tag}
+              price={{ amount: `${p.currentPrice}元` }}
+              meta={p.meta}
+              stats={p.stats}
+            />
+          ))}
       </main>
     </div>
   );

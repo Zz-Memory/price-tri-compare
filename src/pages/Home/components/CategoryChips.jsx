@@ -1,3 +1,16 @@
+/**
+ * 分类 Chips（受控组件）
+ * 用途：在平台标签下方展示可横向滚动的分类选项
+ *
+ * Props:
+ * - items: { key: string; label: string }[]  分类列表
+ * - active: string                            当前选中分类 key
+ * - onChange: (key: string) => void          选中切换回调
+ *
+ * 视觉：
+ * - 选中项：红底浅色（红文案）+ 加粗
+ * - 未选中：灰底
+ */
 const defaultCats = [
   { key: 'pc', label: '电脑' },
   { key: 'phone', label: '手机' },
@@ -8,13 +21,6 @@ const defaultCats = [
   { key: 'home', label: '居家' },
 ];
 
-/**
- * 分类 Chips 组件
- * props:
- * - items: {key,label}[]
- * - active: string
- * - onChange: (key)=>void
- */
 const CategoryChips = ({ items = defaultCats, active = items[0]?.key, onChange = () => {} }) => {
   return (
     <div className="flex space-x-2 text-sm mb-3 overflow-x-auto pb-2">
