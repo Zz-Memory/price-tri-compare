@@ -2,6 +2,7 @@ import {
   ThumbCircleO,
   CommentCircleO
 } from '@react-vant/icons'
+import PriceSparkline from './PriceSparkline'
 
 /**
  * ProductCard 商品卡片（展示组件）
@@ -45,6 +46,7 @@ const ProductCard = ({
   price,
   meta,
   stats,
+  last7dPrices = [],
   closable = true,
 }) => {
   return (
@@ -104,6 +106,13 @@ const ProductCard = ({
               <span className="text-sm font-normal text-gray-500">{price.note}</span>
             )}
           </p>
+
+          {/* 近 7 天价格迷你图（位于价格下方，右对齐） */}
+          {Array.isArray(last7dPrices) && last7dPrices.length > 0 && (
+            <div className="flex justify-end mt-1">
+              <PriceSparkline data={last7dPrices} />
+            </div>
+          )}
 
           {/* 底部元信息与互动数据（评论/点赞） */}
           <div className="flex justify-between items-center text-xs text-gray-500 mt-1">

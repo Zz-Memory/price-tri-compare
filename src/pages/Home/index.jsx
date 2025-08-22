@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Skeleton } from "react-vant";
 import useTitle from "@/hooks/useTitle";
-import HomeHeader from "./components/HomeHeader";
-import QuickActions from "./components/QuickActions";
-import PlatformTabs from "./components/PlatformTabs";
-import CategoryChips from "./components/CategoryChips";
-import ProductCard from "./components/ProductCard";
-
+import HomeHeader from "@/pages/Home/components/HomeHeader";
+import QuickActions from "@/pages/Home/components/QuickActions";
+import PlatformTabs from "@/pages/Home/components/PlatformTabs";
+import CategoryChips from "@/pages/Home/components/CategoryChips";
+import ProductCard from "@/pages/Home/components/ProductCard";
 /**
  * 平台 Tab 数据（受控）
  * - key：传给接口的 platform 参数
@@ -122,7 +122,20 @@ const Home = () => {
 
         {/* 加载/错误提示 */}
         {loading && (
-          <div className="text-center text-sm text-gray-500 py-6">加载中...</div>
+          <div>
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white rounded-lg p-3 mb-3">
+                <div className="flex items-start">
+                  <div className="mr-3">
+                    <Skeleton avatar avatarShape="square" avatarSize={112} title={false} row={0} />
+                  </div>
+                  <div className="flex-1">
+                    <Skeleton title row={3} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
         {errMsg && !loading && (
           <div className="text-center text-sm text-red-500 py-6">{errMsg}</div>
@@ -140,6 +153,7 @@ const Home = () => {
               subtitle={p.subtitle}
               tag={p.tag}
               price={{ amount: `${p.currentPrice}元` }}
+              last7dPrices={p.last7dPrices}
               meta={p.meta}
               stats={p.stats}
             />
