@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+/* 流式根字体：让 rem 随视口宽度在安全区间内缩放 */
+html {
+  font-size: clamp(14px, 1.4vw, 16px);
+}
