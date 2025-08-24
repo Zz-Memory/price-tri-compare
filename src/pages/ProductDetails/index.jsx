@@ -4,6 +4,7 @@ import useTitle from "@/hooks/useTitle";
 import InfoCard from "./components/InfoCard";
 import TrendCard from "./components/TrendCard";
 import BottomBar from "./components/BottomBar";
+import { ArrowLeft } from "@react-vant/icons";
 
 /**
  * 商品详情（组件化）
@@ -44,7 +45,7 @@ const ProductDetails = () => {
             aria-label="返回"
             type="button"
           >
-            <span className="text-xl leading-none">←</span>
+            <span className="text-xl leading-none"><ArrowLeft /></span>
           </button>
           <div className="text-sm text-gray-500">商品详情</div>
           <div className="w-8 h-8" />
