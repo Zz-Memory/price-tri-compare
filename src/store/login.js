@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { doLogin } from "@/services/login";
+import { doLogin, getUser } from "@/services/login";
 
 export const useUserStore = create((set) => ({
   user: null, // 用户信息
@@ -22,6 +22,23 @@ export const useUserStore = create((set) => ({
       });
       return { success: false, msg: msg || "登录失败" };
     }
+  },
+  hydrate: async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      return { success: false };
+    }
+    try {
+      const res = await getUser();
+      const { code, data } = res.data || {};
+      if (code === 0 && data) {
+        set({ user: data, isLogin: true });
+        return { success: true };
+      }
+    } catch (e) {}
+    localStorage.removeItem("token");
+    set({ user: null, isLogin: false });
+    return { success: false };
   },
   loginOut: () => {
     localStorage.removeItem("token");

@@ -1,6 +1,6 @@
 import useTitle from "@/hooks/useTitle";
 
-const AiAssistant = () => {
+const AIAssistant = () => {
   useTitle("AI助手");
   return (
     <>
@@ -9,4 +9,4 @@ const AiAssistant = () => {
   )
 };
 
-export default AiAssistant;
+export default AIAssistant;

@@ -1,7 +1,8 @@
 import { useUserStore } from "@/store/login";
 import {
     useNavigate,
-    useLocation
+    useLocation,
+    Outlet
 } from "react-router-dom";
 import {
     useEffect
@@ -9,20 +10,23 @@ import {
 
 
 
-const RequireAuth = ({children}) => {
-    const {isLogin} = useUserStore();
+const RequireAuth = () => {
+    const {isLogin, hydrate} = useUserStore();
     const navigate = useNavigate();
     const pathname = useLocation();
     useEffect(() => {
-        if(!isLogin){
-            navigate('/login', { state: { from: pathname.pathname } });
-        }
-    }, [isLogin]);
-    return (
-        <div>
-            {children}
-        </div>
-    )
+        (async () => {
+            if (!isLogin) {
+                const token = localStorage.getItem("token");
+                if (token) {
+                    const ret = await hydrate();
+                    if (ret && ret.success) return;
+                }
+                navigate('/login', { state: { from: pathname.pathname } });
+            }
+        })();
+    }, [isLogin, pathname.pathname]);
+    return <Outlet />
 }
 
 export default RequireAuth;

@@ -17,7 +17,7 @@ import RequireAuth from '@/routes/RequireAuth'
 // 懒加载
 const Home = lazy(() => import('@/pages/Home'))
 const SavingTips = lazy(() => import('@/pages/SavingTips'))
-const AiAssistant = lazy(() => import('@/pages/AiAssistant'))
+const AIAssistant = lazy(() => import('@/pages/AiAssistant'))
 const Favorites = lazy(() => import('@/pages/Favorites'))
 const User = lazy(() => import('@/pages/User'))
 const SearchBox = lazy(() => import('@/components/SearchBox'))
@@ -38,7 +38,7 @@ function App() {
             <Route path="/tips" element={<SavingTips />} />
             {/* 受保护路由 */}
             <Route element={<RequireAuth />}>
-              <Route path="/assistant" element={<AiAssistant />} />
+              <Route path="/assistant" element={<AIAssistant />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/user" element={<User />} />
             </Route>

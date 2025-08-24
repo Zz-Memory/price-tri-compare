@@ -8,7 +8,7 @@ const BRAND_COLOR = '#f04a31'; // 慢慢买风格橙红
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from || '/';
+  const from = (location.state && location.state.from && location.state.from !== '/login') ? location.state.from : '/user';
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -16,6 +16,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const login = useUserStore((s) => s.login);
+  const isLogin = useUserStore((s) => s.isLogin);
+  const hydrateStore = useUserStore((s) => s.hydrate);
 
   // 轻量自定义 Toast
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
@@ -37,6 +39,22 @@ export default function Login() {
     };
   }, []);
 
+  useEffect(() => {
+    if (isLogin) {
+      navigate('/user', { replace: true });
+      return;
+    }
+    const token = localStorage.getItem('token');
+    if (token) {
+      (async () => {
+        const ret = await hydrateStore();
+        if (ret && ret.success) {
+          navigate('/user', { replace: true });
+        }
+      })();
+    }
+  }, [isLogin]);
+
   const goBack = () => {
     navigate('/', { replace: true });
   };
@@ -50,10 +68,7 @@ export default function Login() {
       const ret = await login({ username: username.trim(), password: password.trim() });
       if (ret?.success) {
         showToast(ret.msg || '登录成功', 'success');
-        // 成功 3 秒后再跳转，保证提示完整显示
-        setTimeout(() => {
-          navigate(from, { replace: true });
-        }, 3000);
+        navigate(from, { replace: true });
       } else {
         showToast(ret?.msg || '用户名或密码错误', 'fail');
       }
