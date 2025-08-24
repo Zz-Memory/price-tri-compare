@@ -27,33 +27,26 @@ export default [
             msg: "用户名或密码错误",
           };
         }
-        // json 用户数据
+        // 用户资料统一来源，避免重复定义
+        const userProfile = {
+          id: "101",
+          username: "admin",
+          footprints: 0,
+          favorites: 0,
+          coins: 0,
+          points: 0,
+        };
         const token = jwt.sign(
-          {
-            user: {
-              id: "101",
-              username: "admin",
-              level: 4,
-            },
-          },
+          { user: userProfile },
           secret, // 密钥
-          {
-            expiresIn: 86400, // 过期时间 秒
-          }
+          { expiresIn: 86400 } // 过期时间 秒
         );
         // 生成token 颁发令牌
         return {
           code: 200,
           msg: "登录成功",
           token,
-          data: {
-            id: "101",
-            username: "admin",
-            footprints: 0,
-            favorites: 0,
-            coins: 0,
-            points: 0,
-          },
+          data: userProfile,
         };
       } catch (err) {
         return {

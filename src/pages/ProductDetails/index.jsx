@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import useTitle from "@/hooks/useTitle";
+import { useUserStore } from "@/store/login";
 import InfoCard from "./components/InfoCard";
 import TrendCard from "./components/TrendCard";
 import BottomBar from "./components/BottomBar";
@@ -33,6 +34,19 @@ const ProductDetails = () => {
       stats: { comments: 0, likes: 0 },
     };
   }, [product]);
+
+  const incFavorites = useUserStore((s) => s.incFavorites);
+  const decFavorites = useUserStore((s) => s.decFavorites);
+  const [isFavorited, setIsFavorited] = useState(false);
+  const handleFavorite = () => {
+    if (isFavorited) {
+      decFavorites(1);
+      setIsFavorited(false);
+    } else {
+      incFavorites(1);
+      setIsFavorited(true);
+    }
+  };
 
   return (
     <div className="max-w-md mx-auto bg-gray-100 min-h-screen pb-20">
@@ -67,7 +81,11 @@ const ProductDetails = () => {
       {/* 价格趋势：传入 180 天与 7 天序列，内部提供范围切换 */}
       <TrendCard last180d={safe.last180dPrices} last7d={safe.last7dPrices} />
 
-      <BottomBar likes={safe?.stats?.likes ?? 0} comments={safe?.stats?.comments ?? 0} />
+      <BottomBar
+        likes={safe?.stats?.likes ?? 0}
+        comments={safe?.stats?.comments ?? 0}
+        onFavorite={handleFavorite}
+      />
     </div>
   );
 };

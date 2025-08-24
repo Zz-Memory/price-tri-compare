@@ -45,7 +45,13 @@ const User = () => {
       <HeaderCard displayName={displayName} onPointsClick={handlePointsClick} />
 
       {/* 统计 */}
-      <StatRow footprints={0} favorites={0} coins={0} points={0} onFavoritesClick={handleFavoritesClick} />
+      <StatRow
+        footprints={user?.footprints ?? 0}
+        favorites={user?.favorites ?? 0}
+        coins={user?.coins ?? 0}
+        points={user?.points ?? 0}
+        onFavoritesClick={handleFavoritesClick}
+      />
 
       {/* 爆料中心 */}
       <BlastCenter onItemClick={handleBlastClick} />
