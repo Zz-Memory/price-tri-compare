@@ -49,6 +49,10 @@ export default [
           data: {
             id: "101",
             username: "admin",
+            footprints: 0,
+            favorites: 0,
+            coins: 0,
+            points: 0,
           },
         };
       } catch (err) {

@@ -14,18 +14,24 @@ import {
   HotO, 
   FriendsO
 } from "@react-vant/icons"
+import { useNavigate } from "react-router-dom";
 
 const BRAND_COLOR = "#f04a31";
 
 const User = () => {
   useTitle("我的");
   const user = useUserStore((s) => s.user);
+  const navigate = useNavigate();
 
   const displayName = user?.username || "Tony";
 
   const handlePointsClick = () => {
     // 可跳转积分页
     // navigate('/points')
+  };
+
+  const handleFavoritesClick = () => {
+    navigate('/favorites');
   };
 
   const handleBlastClick = (key) => {
@@ -39,7 +45,7 @@ const User = () => {
       <HeaderCard displayName={displayName} onPointsClick={handlePointsClick} />
 
       {/* 统计 */}
-      <StatRow footprints={32} favorites={4} coins={0} points={0} />
+      <StatRow footprints={0} favorites={0} coins={0} points={0} onFavoritesClick={handleFavoritesClick} />
 
       {/* 爆料中心 */}
       <BlastCenter onItemClick={handleBlastClick} />
