@@ -1,3 +1,5 @@
+import {Close} from "@react-vant/icons";
+
 export default function HeaderClose({ onBack }) {
   return (
     <div className="h-12 flex items-center px-4">
@@ -6,7 +8,7 @@ export default function HeaderClose({ onBack }) {
         aria-label="close"
         onClick={onBack}
       >
-        ×
+        <Close />
       </button>
     </div>
   );

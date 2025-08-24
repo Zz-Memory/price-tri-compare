@@ -1,4 +1,5 @@
 import SearchBox from '@/components/SearchBox';
+import {Qr} from "@react-vant/icons";
 
 /**
  * HomeHeader
@@ -20,20 +21,7 @@ const HomeHeader = () => {
 
         {/* 扫码图标 + 领红包 */}
         <div className="flex items-center space-x-2">
-          <span className="text-gray-600" aria-label="scan-qrcode">
-            <svg
-              viewBox="0 0 24 24"
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <rect x="3" y="3" width="7" height="7" rx="1"></rect>
-              <rect x="14" y="3" width="7" height="7" rx="1"></rect>
-              <rect x="3" y="14" width="7" height="7" rx="1"></rect>
-              <rect x="14" y="14" width="7" height="7" rx="1"></rect>
-            </svg>
-          </span>
+            <Qr />
           <button className="bg-red-500 text-white text-sm px-4 py-1 rounded-full">
             领红包
           </button>

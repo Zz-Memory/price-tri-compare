@@ -9,7 +9,7 @@ export default [
   {
     url: "/api/login",
     method: "POST",
-    timeout: 2000, // 请求耗时
+    timeout: 1000, // 请求耗时
     response: (req, res) => {
       const { token: loginToken } = req.body || {};
       if (!loginToken) {

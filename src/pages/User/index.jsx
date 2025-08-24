@@ -4,6 +4,16 @@ import HeaderCard from "./components/HeaderCard";
 import StatRow from "./components/StatRow";
 import BlastCenter from "./components/BlastCenter";
 import MenuList from "./components/MenuList";
+import {
+  SettingO,
+  ShareO,
+  ServiceO,
+  NotesO,
+  Records,
+  Aim, 
+  HotO, 
+  FriendsO
+} from "@react-vant/icons"
 
 const BRAND_COLOR = "#f04a31";
 
@@ -24,7 +34,7 @@ const User = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa] pb-4">
+    <div className="min-h-screen bg-[#f7f8fa] overflow-y-auto" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 96px)' }}>
       {/* 顶部头像与积分 */}
       <HeaderCard displayName={displayName} onPointsClick={handlePointsClick} />
 
@@ -37,26 +47,26 @@ const User = () => {
       {/* 菜单分组一 */}
       <MenuList
         items={[
-          { icon: "🕵️", label: "赏金猎人" },
-          { icon: "📰", label: "好价订阅" },
-          { icon: "💬", label: "社区讨论" },
-          { icon: "🧾", label: "购买记录", rightExtra: "购后防降价" },
+          { icon: <Aim  />, label: "赏金猎人" },
+          { icon: <HotO  />, label: "好价订阅" },
+          { icon: <FriendsO  />, label: "社区讨论" },
+          { icon: <Records  />, label: "购买记录", rightExtra: "购后防降价" },
         ]}
       />
 
       {/* 菜单分组二 */}
       <MenuList
         items={[
-          { icon: "❓", label: "帮助反馈" },
-          { icon: "🛎️", label: "在线客服" },
-          { icon: "↗️", label: "分享慢买", rightExtra: "邀好友避坑，每邀1人得60积分" },
+          { icon: <NotesO />, label: "帮助反馈" },
+          { icon: <ServiceO />, label: "在线客服" },
+          { icon: <ShareO />, label: "分享慢买", rightExtra: "邀好友避坑，每邀1人得60积分" },
         ]}
       />
 
       {/* 菜单分组三 */}
       <MenuList
         items={[
-          { icon: "⚙️", label: "系统设置" },
+          { icon: <SettingO />, label: "系统设置" },
         ]}
       />
 
