@@ -12,6 +12,7 @@ import './App.css'
 import MainLayout from '@/components/MainLayOut'
 import BlankLayout from '@/components/BlankLayout'
 import Loading from '@/components/Loading'
+import RequireAuth from '@/routes/RequireAuth'
 
 // 懒加载
 const Home = lazy(() => import('@/pages/Home'))
@@ -21,6 +22,7 @@ const Favorites = lazy(() => import('@/pages/Favorites'))
 const User = lazy(() => import('@/pages/User'))
 const SearchBox = lazy(() => import('@/components/SearchBox'))
 const ProductDetails = lazy(() => import('@/pages/ProductDetails'))
+const Login = lazy(() => import('@/pages/Login'))
 
 function App() {
 
@@ -34,15 +36,19 @@ function App() {
             <Route path="/" element={<Navigate to='/home' />} />
             <Route path='/home' element={<Home />} />
             <Route path="/tips" element={<SavingTips />} />
-            <Route path="/assistant" element={<AiAssistant />} />
-            <Route path="/favorites" element={<Favorites />} />
-            <Route path="/user" element={<User />} />
+            {/* 受保护路由 */}
+            <Route element={<RequireAuth />}>
+              <Route path="/assistant" element={<AiAssistant />} />
+              <Route path="/favorites" element={<Favorites />} />
+              <Route path="/user" element={<User />} />
+            </Route>
           </Route>
 
         {/* 不带TabBar的布局 */}
           <Route element={<BlankLayout />}>
             <Route path="/search" element={<SearchBox />} />
             <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/login" element={<Login />} />
           </Route>
         </Routes>
       </Suspense>
