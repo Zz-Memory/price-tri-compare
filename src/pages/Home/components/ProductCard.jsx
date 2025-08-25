@@ -1,6 +1,7 @@
 import {
   ThumbCircleO,
-  CommentCircleO
+  CommentCircleO,
+  Cross
 } from '@react-vant/icons'
 import PriceSparkline from './PriceSparkline'
 
@@ -80,7 +81,7 @@ const ProductCard = ({
                 aria-label="close-card"
                 type="button"
               >
-                ×
+                <Cross />
               </button>
             )}
           </div>

@@ -44,6 +44,7 @@ const ProductDetails = () => {
 
   const incFavorites = useUserStore((s) => s.incFavorites);
   const decFavorites = useUserStore((s) => s.decFavorites);
+  const isLogin = useUserStore((s) => s.isLogin);
 
   // 仅读写当前用户的收藏列表
   const byUser = useFavoritesStore((s) => s.byUser);
@@ -57,6 +58,16 @@ const ProductDetails = () => {
 
   const handleFavorite = () => {
     if (!product?.id) return;
+
+    // 未登录则跳转登录，登录完成后返回当前商品详情页
+    if (!isLogin) {
+      const pid = product?.id;
+      const from = pid != null ? `/product/${pid}` : "/product";
+      navigate("/login", { replace: true, state: { from, backState: { item: product } } });
+      return;
+    }
+
+    // 已登录：正常收藏/取消收藏
     const existed = items.some((it) => it.id === product.id);
     toggleFav(product, userKey);
     if (existed) {

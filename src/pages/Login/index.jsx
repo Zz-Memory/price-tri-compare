@@ -13,6 +13,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state && location.state.from && location.state.from !== '/login') ? location.state.from : '/user';
+  const backState = location.state?.backState;
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -26,6 +27,7 @@ export default function Login() {
   // 轻量自定义 Toast
   const [toast, setToast] = useState({ visible: false, message: '', type: 'success' });
   const timerRef = useRef(null);
+  const navigatedRef = useRef(false);
   const showToast = (message, type = 'success') => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -43,18 +45,22 @@ export default function Login() {
     };
   }, []);
 
-  // 已登录访问 /login 时，直接重定向到 /user。若本地有 token 但未恢复，则先 hydrate。
+  // 已登录访问 /login 时，重定向回来源页；若本地有 token 但未恢复，则先 hydrate（均保证只导航一次）
   useEffect(() => {
     if (isLogin) {
-      navigate('/user', { replace: true });
+      if (!navigatedRef.current) {
+        navigatedRef.current = true;
+        navigate(from, { replace: true, state: backState });
+      }
       return;
     }
     const token = localStorage.getItem('token');
     if (token) {
       (async () => {
         const ret = await hydrateStore();
-        if (ret && ret.success) {
-          navigate('/user', { replace: true });
+        if (ret && ret.success && !navigatedRef.current) {
+          navigatedRef.current = true;
+          navigate(from, { replace: true, state: backState });
         }
       })();
     }
@@ -73,7 +79,10 @@ export default function Login() {
       const ret = await login({ username: username.trim(), password: password.trim() });
       if (ret?.success) {
         showToast(ret.msg || '登录成功', 'success');
-        navigate(from, { replace: true });
+        if (!navigatedRef.current) {
+          navigatedRef.current = true;
+          navigate(from, { replace: true, state: backState });
+        }
       } else {
         showToast(ret?.msg || '用户名或密码错误', 'fail');
       }
