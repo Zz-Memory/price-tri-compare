@@ -1,103 +1,132 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft } from "@react-vant/icons";
+import { HOT_SEARCHES } from "@/constants/search";
+import History from "./components/History";
+import Hot from "./components/Hot";
+import SearchBar from "./components/SearchBar";
+import Toast from "./components/Toast";
 
 const THEME = "#f04a31";
+const HIST_KEY = "ptc_search_history";
+
+function readHistory() {
+  try {
+    const raw = localStorage.getItem(HIST_KEY);
+    const arr = JSON.parse(raw || "[]");
+    return Array.isArray(arr) ? arr.filter(Boolean) : [];
+  } catch {
+    return [];
+  }
+}
+
+// 从热门池中随机抽取一批（默认8条）
+function getRandomHot(pool = HOT_SEARCHES, count = 8) {
+  const arr = [...pool];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, Math.min(count, arr.length));
+}
 
 export default function Search() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const initialQuery = params.get("q") || "";
   const [keyword, setKeyword] = useState(initialQuery);
-  const [status, setStatus] = useState(initialQuery ? "searching" : "idle");
+  const [history, setHistory] = useState(() => readHistory());
+  const [hotItems, setHotItems] = useState(() => getRandomHot());
 
-  const doSearch = (q) => {
-    const query = (q ?? keyword).trim();
-    if (!query) return;
-    setStatus("searching");
-    // TODO: 接入真实搜索接口
-    setTimeout(() => setStatus("done"), 400);
+  // 轻量 Toast 控制
+  const [toast, setToast] = useState({ open: false, message: "" });
+  const toastTimerRef = useRef(null);
+  const showToast = (message) => {
+    setToast({ open: true, message });
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => {
+      setToast({ open: false, message: "" });
+    }, 1600);
+  };
+
+  const saveHistory = (list) => {
+    setHistory(list);
+    localStorage.setItem(HIST_KEY, JSON.stringify(list));
+  };
+
+  const addToHistory = (q) => {
+    const kw = (q || "").trim();
+    if (!kw) return;
+    const next = [kw, ...history.filter((x) => x !== kw)].slice(0, 20);
+    saveHistory(next);
+  };
+
+  const handleDeleteItem = (kw) => {
+    saveHistory(history.filter((x) => x !== kw));
+  };
+
+  const handleClearAll = () => {
+    saveHistory([]);
+  };
+
+  const handleSearchKeyword = (kw) => {
+    setKeyword(kw);
+    addToHistory(kw);
+    navigate(`/search/result?q=${encodeURIComponent(kw)}`);
   };
 
   useEffect(() => {
-    if (initialQuery) doSearch(initialQuery);
+    if (initialQuery) {
+      // 初始化时带 q 参数，直接跳结果页并写入历史
+      handleSearchKeyword(initialQuery);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSubmit = (e) => {
     e.preventDefault();
-    const q = keyword.trim();
-    if (!q) return;
-    navigate(`/search?q=${encodeURIComponent(q)}`, { replace: true });
-    doSearch(q);
+    const q = (keyword || "").trim();
+    if (!q) {
+      showToast("请输入关键词");
+      return;
+    }
+    addToHistory(q);
+    navigate(`/search/result?q=${encodeURIComponent(q)}`);
   };
 
   const goBack = () => {
     if (window.history.length > 1) {
       navigate(-1);
     } else {
-      navigate('/home');
+      navigate("/home");
     }
   };
 
   return (
     <div className="min-h-screen bg-white">
       <header className="sticky top-0 z-10 bg-white p-3 border-b border-gray-100">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={goBack}
-            className="shrink-0 w-9 h-9 flex items-center justify-center hover:bg-gray-50 active:bg-gray-100"
-            aria-label="返回"
-          >
-            <ArrowLeft />
-          </button>
-          <form onSubmit={onSubmit} className="relative flex-1">
-            <input
-              type="text"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-              placeholder="输入商品名称、型号或关键词"
-              className="w-full pl-9 pr-24 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2"
-              style={{ "--tw-ring-color": THEME, caretColor: THEME }}
-            />
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="7"></circle>
-                <line x1="16.65" y1="16.65" x2="21" y2="21"></line>
-              </svg>
-            </span>
-            <button
-              type="submit"
-              className="absolute right-1 top-1/2 -translate-y-1/2 text-white px-5 py-1.5 rounded-full text-sm"
-              style={{ backgroundColor: THEME }}
-            >
-              搜索
-            </button>
-          </form>
-        </div>
+        <SearchBar
+          keyword={keyword}
+          onChange={setKeyword}
+          onSubmit={onSubmit}
+          onBack={goBack}
+        />
       </header>
 
-      <main className="p-4">
-        {status === "idle" && <p className="text-sm text-gray-500">输入关键词开始搜索</p>}
-        {status === "searching" && (
-          <p className="text-sm text-gray-500">
-            正在搜索：<span className="font-medium text-gray-900">{keyword}</span> …
-          </p>
-        )}
-        {status === "done" && (
-          <div>
-            <p className="text-sm text-gray-500 mb-2">
-              已根据关键词“<span className="font-medium text-gray-900">{keyword}</span>”展示结果（示意）
-            </p>
-            <ul className="space-y-2">
-              <li className="p-3 border border-gray-100 rounded-lg">示例结果 1</li>
-              <li className="p-3 border border-gray-100 rounded-lg">示例结果 2</li>
-              <li className="p-3 border border-gray-100 rounded-lg">示例结果 3</li>
-            </ul>
-          </div>
-        )}
+      <main className="p-4 space-y-4">
+        <History
+          items={history}
+          onClickItem={handleSearchKeyword}
+          onDeleteItem={handleDeleteItem}
+          onClear={handleClearAll}
+        />
+        <Hot
+          items={hotItems}
+          onClickItem={handleSearchKeyword}
+          onShuffle={() => setHotItems(getRandomHot())}
+        />
       </main>
+
+      <Toast open={toast.open} message={toast.message} />
     </div>
   );
 }

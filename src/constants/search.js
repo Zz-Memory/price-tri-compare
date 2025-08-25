@@ -14,3 +14,16 @@ export const SEARCH_HINTS = [
   "iPad Air 5 教育优惠",
   "联想 小新 Pro 14 笔记本"
 ];
+
+export const HOT_SEARCHES = [
+  "iPhone 16",
+  "Mate 60",
+  "AirPods Pro 2",
+  "Switch OLED",
+  "小米 14",
+  "戴森 V12 吸尘器",
+  "iPad Air 5",
+  "ThinkPad X1",
+  "海尔 冰箱",
+  "RTX 4070 显卡"
+];
