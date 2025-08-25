@@ -53,7 +53,7 @@ const MainLayout = () => {
             <div>
                 <Outlet />
             </div>
-            <Tabbar value={activeTab} onChange={handleTabChange} fixed>
+            <Tabbar activeColor='#f04a31' value={activeTab} onChange={handleTabChange} fixed>
                 {tabs.map((tab, index) => (
                     <Tabbar.Item key={index} icon={tab.icon}>
                         {tab.title}
