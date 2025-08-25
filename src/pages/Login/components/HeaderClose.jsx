@@ -1,4 +1,4 @@
-import {Close} from "@react-vant/icons";
+import {Cross} from "@react-vant/icons";
 
 export default function HeaderClose({ onBack }) {
   return (
@@ -8,7 +8,7 @@ export default function HeaderClose({ onBack }) {
         aria-label="close"
         onClick={onBack}
       >
-        <Close />
+        <Cross />
       </button>
     </div>
   );

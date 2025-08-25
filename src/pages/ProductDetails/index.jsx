@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import useTitle from "@/hooks/useTitle";
 import { useUserStore } from "@/store/login";
+import { useFavoritesStore } from "@/store/favorites";
 import InfoCard from "./components/InfoCard";
 import TrendCard from "./components/TrendCard";
 import BottomBar from "./components/BottomBar";
@@ -37,14 +38,23 @@ const ProductDetails = () => {
 
   const incFavorites = useUserStore((s) => s.incFavorites);
   const decFavorites = useUserStore((s) => s.decFavorites);
-  const [isFavorited, setIsFavorited] = useState(false);
+
+  const items = useFavoritesStore((s) => s.items);
+  const toggleFav = useFavoritesStore((s) => s.toggle);
+
+  const favorited = useMemo(() => {
+    if (!product?.id) return false;
+    return items.some((it) => it.id === product.id);
+  }, [items, product?.id]);
+
   const handleFavorite = () => {
-    if (isFavorited) {
+    if (!product?.id) return;
+    const existed = items.some((it) => it.id === product.id);
+    toggleFav(product);
+    if (existed) {
       decFavorites(1);
-      setIsFavorited(false);
     } else {
       incFavorites(1);
-      setIsFavorited(true);
     }
   };
 
@@ -84,6 +94,7 @@ const ProductDetails = () => {
       <BottomBar
         likes={safe?.stats?.likes ?? 0}
         comments={safe?.stats?.comments ?? 0}
+        favorited={favorited}
         onFavorite={handleFavorite}
       />
     </div>

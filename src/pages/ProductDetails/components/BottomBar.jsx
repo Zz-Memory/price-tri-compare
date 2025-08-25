@@ -1,8 +1,9 @@
-import { ThumbCircleO, CommentCircleO, StarO, ShareO } from "@react-vant/icons";
+import { ThumbCircleO, CommentCircleO, StarO,Star,ShareO } from "@react-vant/icons";
 
 const BottomBar = ({
   likes = 0,
   comments = 0,
+  favorited = false,
   onRecommend = () => {},
   onFavorite = () => {},
   onComment = () => {},
@@ -30,8 +31,8 @@ const BottomBar = ({
             onClick={onFavorite}
             className="flex flex-col items-center text-xs"
           >
-            <span className="text-[20px]">
-              <StarO />
+            <span className={`text-[20px] ${favorited ? "text-orange-500" : ""}`}>
+              {favorited ? <Star /> : <StarO />}
             </span>
             <span className="mt-0.5">收藏</span>
           </button>

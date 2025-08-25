@@ -12,9 +12,12 @@ import {
   Records,
   Aim, 
   HotO, 
-  FriendsO
+  FriendsO,
+  Revoke,
 } from "@react-vant/icons"
+import { Dialog } from "react-vant";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const BRAND_COLOR = "#f04a31";
 
@@ -22,6 +25,9 @@ const User = () => {
   useTitle("我的");
   const user = useUserStore((s) => s.user);
   const navigate = useNavigate();
+  const loginOut = useUserStore((s) => s.loginOut);
+  const [showLogout, setShowLogout] = useState(false);
+  const onLogoutClick = () => setShowLogout(true);
 
   const displayName = user?.username || "Tony";
 
@@ -71,7 +77,7 @@ const User = () => {
         items={[
           { icon: <NotesO />, label: "帮助反馈" },
           { icon: <ServiceO />, label: "在线客服" },
-          { icon: <ShareO />, label: "分享慢买", rightExtra: "邀好友避坑，每邀1人得60积分" },
+          { icon: <ShareO />, label: "分享货三家", rightExtra: "邀好友避坑，每邀1人得60积分" },
         ]}
       />
 
@@ -79,10 +85,27 @@ const User = () => {
       <MenuList
         items={[
           { icon: <SettingO />, label: "系统设置" },
+          {
+            icon: <Revoke />,
+            label: "退出登录",
+            onClick: onLogoutClick,
+          },
         ]}
       />
-
-      <div className="h-6" />
+      <Dialog
+        visible={showLogout}
+        title="确认操作"
+        showCancelButton
+        onConfirm={() => {
+          setShowLogout(false);
+          loginOut();
+          navigate("/login");
+        }}
+        onCancel={() => setShowLogout(false)}
+        onClose={() => setShowLogout(false)}
+      >
+        <div className="text-center">确认退出登录？</div>
+      </Dialog>
     </div>
   );
 };
