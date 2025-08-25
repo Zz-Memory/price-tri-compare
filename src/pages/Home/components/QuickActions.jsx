@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 /**
  * QuickActions
  * - 首页顶部的 5 个圆形快捷入口
@@ -15,10 +17,11 @@ const actions = [
 ];
 
 const QuickActions = () => {
+  const navigate = useNavigate();
   return (
     <div className="flex justify-around text-center text-xs text-gray-700">
       {actions.map((it) => (
-        <div key={it.label} className="relative">
+        <div key={it.label} className="relative cursor-pointer" onClick={() => navigate('/todo')}>
           {/* 圆形图标容器 */}
           <div className={`w-12 h-12 ${it.color} rounded-full flex items-center justify-center`}>
             <span className="text-lg leading-none">{it.icon}</span>

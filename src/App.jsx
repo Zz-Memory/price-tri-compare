@@ -23,6 +23,8 @@ const User = lazy(() => import('@/pages/User'))
 const SearchBox = lazy(() => import('@/components/SearchBox'))
 const ProductDetails = lazy(() => import('@/pages/ProductDetails'))
 const Login = lazy(() => import('@/pages/Login'))
+const Todo = lazy(() => import('@/pages/Todo'))
+const NotFound = lazy(() => import('@/pages/404'))
 
 function App() {
 
@@ -49,7 +51,9 @@ function App() {
             <Route path="/search" element={<SearchBox />} />
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/todo" element={<Todo />} />
           </Route>
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </>
