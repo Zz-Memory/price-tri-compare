@@ -8,6 +8,8 @@ import TrendCard from "./components/TrendCard";
 import BottomBar from "./components/BottomBar";
 import { ArrowLeft } from "@react-vant/icons";
 
+const EMPTY = Object.freeze([]);
+
 /**
  * 商品详情（组件化）
  * - 仅使用首页卡片字段进行渲染
@@ -17,6 +19,10 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const { state } = useLocation();
   const product = state?.item;
+
+  // 当前用户 key（优先 id，其次 username；未登录 -> guest）
+  const user = useUserStore((s) => s.user);
+  const userKey = user?.id ?? user?.username ?? "guest";
 
   // 兜底（如果直接打开详情且没有 state）
   const safe = useMemo(() => {
@@ -39,7 +45,9 @@ const ProductDetails = () => {
   const incFavorites = useUserStore((s) => s.incFavorites);
   const decFavorites = useUserStore((s) => s.decFavorites);
 
-  const items = useFavoritesStore((s) => s.items);
+  // 仅读写当前用户的收藏列表
+  const byUser = useFavoritesStore((s) => s.byUser);
+  const items = byUser?.[userKey] ?? EMPTY;
   const toggleFav = useFavoritesStore((s) => s.toggle);
 
   const favorited = useMemo(() => {
@@ -50,7 +58,7 @@ const ProductDetails = () => {
   const handleFavorite = () => {
     if (!product?.id) return;
     const existed = items.some((it) => it.id === product.id);
-    toggleFav(product);
+    toggleFav(product, userKey);
     if (existed) {
       decFavorites(1);
     } else {

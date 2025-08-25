@@ -10,11 +10,19 @@ import SubTabs from "./components/SubTabs";
 import ListItem from "./components/ListItem";
 import ManageBar from "./components/ManageBar";
 
+const EMPTY = Object.freeze([]);
+
 const Favorites = () => {
   useTitle("收藏");
   const navigate = useNavigate();
 
-  const items = useFavoritesStore((s) => s.items) || [];
+  // 当前用户 key（优先 id，其次 username；未登录 -> guest）
+  const user = useUserStore((s) => s.user);
+  const userKey = user?.id ?? user?.username ?? "guest";
+
+  // 仅读取当前用户的收藏
+  const byUser = useFavoritesStore((s) => s.byUser);
+  const items = byUser?.[userKey] ?? EMPTY;
   const removeById = useFavoritesStore((s) => s.removeById);
   const removeBatch = useFavoritesStore((s) => s.removeBatch);
   const decFavorites = useUserStore((s) => s.decFavorites);
@@ -67,7 +75,7 @@ const Favorites = () => {
   };
 
   const handleRemoveSingle = (id) => {
-    removeById(id);
+    removeById(id, userKey);
     decFavorites(1);
     setSelected((prev) => {
       const next = new Set(prev);
@@ -79,7 +87,7 @@ const Favorites = () => {
   const handleBatchRemove = () => {
     if (selected.size === 0) return;
     const ids = Array.from(selected);
-    removeBatch(ids);
+    removeBatch(ids, userKey);
     decFavorites(ids.length);
     setSelected(new Set());
   };
@@ -115,11 +123,6 @@ const Favorites = () => {
         </div>
       )}
 
-      {!manage && (
-        <div className="py-6 text-center text-xs text-gray-400">
-          -- 展示近一年收藏爆料，左滑可取消收藏 --
-        </div>
-      )}
 
       {manage && (
         <ManageBar

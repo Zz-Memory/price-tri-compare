@@ -2,55 +2,66 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
 /**
- * 收藏 Store
- * - items: 收藏的商品数组（完整商品对象，要求含 id）
- * - add(item): 添加收藏（去重）
- * - removeById(id): 按 id 取消收藏
- * - toggle(item): 切换收藏
- * - removeBatch(ids): 批量取消收藏
- * - clear(): 清空
+ * 收藏 Store（按用户分桶）
+ * - byUser: { [userKey: string]: Product[] }
+ * - 方法均需传入 userKey，保证每个用户只操作自己的收藏
  */
 export const useFavoritesStore = create(
   persist(
     (set, get) => ({
-      items: [],
+      byUser: {},
 
-      add: (item) =>
+      // 获取指定用户列表（工具方法，可在组件选择器中使用 s.byUser[userKey] || [] 代替）
+      getList: (userKey) => {
+        const key = userKey ?? "guest";
+        return get().byUser[key] || [];
+      },
+
+      add: (item, userKey) =>
         set((state) => {
+          const key = userKey ?? "guest";
           if (!item || item.id == null) return state;
-          if (state.items.some((it) => it.id === item.id)) return state;
-          return { items: [item, ...state.items] };
+          const list = state.byUser[key] || [];
+          if (list.some((it) => it.id === item.id)) return state;
+          return { byUser: { ...state.byUser, [key]: [item, ...list] } };
         }),
 
-      removeById: (id) =>
-        set((state) => ({
-          items: state.items.filter((it) => it.id !== id),
-        })),
-
-      toggle: (item) =>
+      removeById: (id, userKey) =>
         set((state) => {
-          if (!item || item.id == null) return state;
-          const exists = state.items.some((it) => it.id === item.id);
-          return {
-            items: exists
-              ? state.items.filter((it) => it.id !== item.id)
-              : [item, ...state.items],
-          };
+          const key = userKey ?? "guest";
+          const list = state.byUser[key] || [];
+          return { byUser: { ...state.byUser, [key]: list.filter((it) => it.id !== id) } };
         }),
 
-      removeBatch: (ids = []) =>
+      toggle: (item, userKey) =>
         set((state) => {
+          const key = userKey ?? "guest";
+          if (!item || item.id == null) return state;
+          const list = state.byUser[key] || [];
+          const exists = list.some((it) => it.id === item.id);
+          const next = exists ? list.filter((it) => it.id !== item.id) : [item, ...list];
+          return { byUser: { ...state.byUser, [key]: next } };
+        }),
+
+      removeBatch: (ids = [], userKey) =>
+        set((state) => {
+          const key = userKey ?? "guest";
+          const list = state.byUser[key] || [];
           const setIds = new Set(ids);
-          return { items: state.items.filter((it) => !setIds.has(it.id)) };
+          return { byUser: { ...state.byUser, [key]: list.filter((it) => !setIds.has(it.id)) } };
         }),
 
-      clear: () => set({ items: [] }),
+      clearUser: (userKey) =>
+        set((state) => {
+          const key = userKey ?? "guest";
+          return { byUser: { ...state.byUser, [key]: [] } };
+        }),
     }),
     {
-      name: "ptc_favorites",
+      name: "ptc_favorites_by_user",
       version: 1,
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ items: state.items }),
+      partialize: (state) => ({ byUser: state.byUser }),
     }
   )
 );

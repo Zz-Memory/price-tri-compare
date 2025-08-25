@@ -5,7 +5,8 @@ const ManageBar = ({
   onToggleAll,
   onBatchRemove,
 }) => {
-  if (total === 0) return null;
+  const disableAll = total === 0;
+  const disableBatch = selectedCount === 0;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t">
@@ -13,17 +14,21 @@ const ManageBar = ({
         <button
           type="button"
           onClick={onToggleAll}
-          className="text-sm text-gray-700"
+          disabled={disableAll}
+          className={`text-sm ${disableAll ? "text-gray-400" : "text-gray-700"}`}
         >
           {isAllSelected ? "取消全选" : "全选"}
         </button>
 
         <button
           type="button"
-          onClick={onBatchRemove}
-          disabled={selectedCount === 0}
+          onClick={() => {
+            // 延后一帧执行，避免同步卸载与提交冲突
+            requestAnimationFrame(() => onBatchRemove?.());
+          }}
+          disabled={disableBatch}
           className={`text-sm px-3 py-1 rounded ${
-            selectedCount === 0
+            disableBatch
               ? "bg-gray-200 text-gray-400"
               : "bg-red-500 text-white active:bg-red-600"
           }`}
