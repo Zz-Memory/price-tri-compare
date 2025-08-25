@@ -1,9 +1,11 @@
-import { Link } from "react-router-dom";
+import { memo } from "react";
+import { useNavigate } from "react-router-dom";
 import { CommentCircleO, ThumbCircleO } from "@react-vant/icons";
 
 /**
  * 收藏列表单项
- * - 非管理态：整行可点击，进入详情
+ * - 统一根节点为 div，避免在管理态/非管理态切换时根节点类型变化引发 DOM 提交冲突
+ * - 非管理态：点击整行进入详情
  * - 管理态：显示复选框与“取消收藏”按钮
  */
 const ListItem = ({
@@ -13,19 +15,40 @@ const ListItem = ({
   onCheckChange, // (id, nextChecked)
   onRemove, // (id)
 }) => {
+  const navigate = useNavigate();
   const priceStr = item.priceText ? item.priceText : (item.currentPrice ? `${item.currentPrice}元` : "");
-  const content = (
-    <div className="px-3 py-3 bg-white">
+
+  const handleOpen = () => {
+    if (manage) return;
+    if (!item?.id) return;
+    navigate(`/product/${item.id}`, { state: { item } });
+  };
+
+  return (
+    <div
+      className="px-3 py-3 bg-white"
+      onClick={handleOpen}
+      role={!manage ? "button" : undefined}
+      tabIndex={!manage ? 0 : undefined}
+    >
       <div className="flex items-start">
+        {/* 左侧：管理态为复选框；非管理态用占位保证对齐 */}
         {manage ? (
-          <label className="mr-2 mt-1">
+          <label
+            className="mr-2 mt-1"
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
             <input
               type="checkbox"
               checked={checked}
               onChange={(e) => onCheckChange?.(item.id, e.target.checked)}
+              style={{ accentColor: "#f04a31" }}
             />
           </label>
-        ) : null}
+        ) : (
+          <div className="mr-2 mt-1" style={{ width: 16 }} />
+        )}
 
         {/* 封面 */}
         <div className="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden bg-gray-100">
@@ -40,7 +63,7 @@ const ListItem = ({
             {item.title || "未知商品"}
           </h3>
           {priceStr ? (
-            <div className="text-orange-500 text-[15px] mt-1">{priceStr}</div>
+            <div className="text-[15px] mt-1" style={{ color: "#f04a31" }}>{priceStr}</div>
           ) : null}
 
           <div className="flex justify-between items-center text-xs text-gray-500 mt-1">
@@ -56,33 +79,22 @@ const ListItem = ({
           </div>
         </div>
 
+        {/* 右侧：管理态显示“取消”按钮；非管理态用占位保证对齐 */}
         {manage ? (
           <button
             type="button"
-            onClick={() => onRemove?.(item.id)}
-            className="ml-2 text-xs text-red-500 active:text-red-600"
+            onClick={(e) => { e.stopPropagation(); onRemove?.(item.id); }}
+            className="ml-2 text-xs"
+            style={{ color: "#f04a31" }}
           >
             取消
           </button>
-        ) : null}
+        ) : (
+          <div className="ml-2 text-xs" style={{ width: 24 }} />
+        )}
       </div>
     </div>
   );
-
-  if (manage) {
-    return content;
-  }
-
-  // 非管理态：整行可点击进入详情
-  return (
-    <Link
-      to={`/product/${item.id}`}
-      state={{ item }}
-      className="block"
-    >
-      {content}
-    </Link>
-  );
 };
 
-export default ListItem;
+export default memo(ListItem);

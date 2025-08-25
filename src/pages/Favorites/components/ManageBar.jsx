@@ -27,11 +27,8 @@ const ManageBar = ({
             requestAnimationFrame(() => onBatchRemove?.());
           }}
           disabled={disableBatch}
-          className={`text-sm px-3 py-1 rounded ${
-            disableBatch
-              ? "bg-gray-200 text-gray-400"
-              : "bg-red-500 text-white active:bg-red-600"
-          }`}
+          className={`text-sm px-3 py-1 rounded ${disableBatch ? "bg-gray-200 text-gray-400" : "text-white"}`}
+          style={!disableBatch ? { backgroundColor: "#f04a31" } : undefined}
         >
           取消收藏{selectedCount > 0 ? `(${selectedCount})` : ""}
         </button>
