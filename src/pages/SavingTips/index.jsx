@@ -14,7 +14,6 @@ const SavingTips = () => {
   const [loading, setLoading] = useState(false);
 
   const loadingRef = useRef(false);
-  const userScrolledRef = useRef(false);
   const bottomRef = useRef(null);
 
   const loadPage = async (nextPage = 1) => {
@@ -37,11 +36,6 @@ const SavingTips = () => {
 
   useEffect(() => {
     loadPage(1);
-    const onScroll = () => {
-      userScrolledRef.current = true;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -51,7 +45,7 @@ const SavingTips = () => {
     const io = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry.isIntersecting && hasMore && !loadingRef.current && userScrolledRef.current) {
+        if (entry.isIntersecting && hasMore && !loadingRef.current) {
           loadPage(page + 1);
         }
       },
@@ -59,7 +53,19 @@ const SavingTips = () => {
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [page, hasMore]);
+  }, [page, hasMore, list.length]);
+
+  // 兜底：窗口滚动接近底部时加载（避免某些环境下 IO 不触发）
+  useEffect(() => {
+    const onScroll = () => {
+      if (!hasMore || loadingRef.current || list.length === 0) return;
+      const doc = document.scrollingElement || document.documentElement;
+      const nearBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 200;
+      if (nearBottom) loadPage(page + 1);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [page, hasMore, list.length]);
 
   // 首屏骨架占位（两列瀑布流，10 个）
   const showSkeleton = loading && list.length === 0;
