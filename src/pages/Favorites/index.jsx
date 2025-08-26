@@ -114,7 +114,7 @@ const Favorites = () => {
       {empty ? (
         <div className="py-20 text-center text-gray-400">暂无收藏</div>
       ) : (
-        <div className="divide-y">
+        <div className="px-3 space-y-3">
           {filtered.map((item) => (
             <ListItem
               key={item.id}
