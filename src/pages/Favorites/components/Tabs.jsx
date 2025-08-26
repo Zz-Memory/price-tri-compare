@@ -1,6 +1,5 @@
 const Tabs = ({ value = "deal", onChange }) => {
   const items = [
-    { key: "all", label: "全网商品" },
     { key: "deal", label: "折扣爆料" },
     { key: "post", label: "社区帖子" },
   ];
