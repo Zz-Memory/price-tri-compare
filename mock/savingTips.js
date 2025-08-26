@@ -7,9 +7,7 @@ function genCover() {
   const bg = Random.color();
   let fg = Random.color();
   if (fg === bg) fg = '#ffffff';
-  // 随机高度以制造瀑布流的高低错落（120~220）
-  const h = Random.integer(120, 220);
-  return Random.image(`240x${h}`, bg, fg, 'png', 'img');
+  return Random.image('240x135', bg, fg, 'png', 'img');
 }
 function genAvatar() {
   const bg = Random.color();

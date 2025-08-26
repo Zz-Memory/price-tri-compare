@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 
 const clamp2 = {
   display: "-webkit-box",
@@ -13,17 +13,32 @@ const clampTitle = {
   overflow: "hidden",
 };
 
+// 基于 id 生成稳定随机高度，避免重渲时高度抖动
+function heightById(id, min = 120, max = 220) {
+  if (!id) return Math.floor((min + max) / 2);
+  let hash = 0;
+  for (let i = 0; i < id.length; i += 1) {
+    hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
+  }
+  const span = max - min + 1;
+  return min + (hash % span);
+}
+
 const TipCard = ({ data }) => {
   const art = data || {};
+  const coverH = useMemo(() => heightById(art.id), [art.id]);
+
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       {art.cover ? (
-        <img
-          src={art.cover}
-          alt="cover"
-          className="w-full block"
-          style={{ display: "block", width: "100%", height: "auto" }}
-        />
+        <div style={{ width: "100%", height: coverH, overflow: "hidden" }}>
+          <img
+            src={art.cover}
+            alt="cover"
+            className="w-full h-full object-cover block"
+            style={{ display: "block", width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        </div>
       ) : null}
 
       <div className="p-3">

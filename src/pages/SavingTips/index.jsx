@@ -3,6 +3,7 @@ import useTitle from "@/hooks/useTitle";
 import { fetchSavingTips } from "@/services/savingTips";
 import Waterfall from "./components/Waterfall";
 import TipCard from "./components/TipCard";
+import TipSkeleton from "./components/TipSkeleton";
 
 const SavingTips = () => {
   useTitle("省钱攻略");
@@ -60,23 +61,43 @@ const SavingTips = () => {
     return () => io.disconnect();
   }, [page, hasMore]);
 
+  // 首屏骨架占位（两列瀑布流，10 个）
+  const showSkeleton = loading && list.length === 0;
+  const skeletonSeeds = Array.from({ length: 10 }, (_, i) => i + 1);
+
   return (
     <div className="max-w-md mx-auto min-h-screen bg-gray-100 pb-16">
       <div className="px-3 py-3 text-base font-medium">省钱攻略</div>
 
-      <Waterfall
-        items={list}
-        columnCount={2}
-        gap={12}
-        itemGap={12}
-        renderItem={(art) => <TipCard data={art} />}
-      />
+      {showSkeleton ? (
+        <Waterfall
+          items={skeletonSeeds}
+          columnCount={2}
+          gap={12}
+          itemGap={12}
+          renderItem={(seed) => <TipSkeleton seed={seed} />}
+        />
+      ) : (
+        <>
+          <Waterfall
+            items={list}
+            columnCount={2}
+            gap={12}
+            itemGap={12}
+            renderItem={(art) => <TipCard data={art} />}
+          />
 
-      <div className="px-3 mt-3">
-        {loading && <div className="py-3 text-center text-xs text-gray-400">加载中...</div>}
-        {!hasMore && <div className="py-3 text-center text-xs text-gray-400">没有更多了</div>}
-        <div ref={bottomRef} style={{ height: 1 }} />
-      </div>
+          <div className="px-3 mt-3">
+            {loading && (
+              <div className="py-3 text-center text-xs text-gray-400">加载中...</div>
+            )}
+            {!hasMore && (
+              <div className="py-3 text-center text-xs text-gray-400">没有更多了</div>
+            )}
+            <div ref={bottomRef} style={{ height: 1 }} />
+          </div>
+        </>
+      )}
     </div>
   );
 };
