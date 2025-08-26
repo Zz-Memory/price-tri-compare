@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useTitle from "@/hooks/useTitle";
 import { useFavoritesStore } from "@/store/favorites";
@@ -9,6 +9,7 @@ import SearchBox from "./components/SearchBox";
 import SubTabs from "./components/SubTabs";
 import ListItem from "./components/ListItem";
 import ManageBar from "./components/ManageBar";
+import { debounce } from "@/utils/debounce";
 
 const EMPTY = Object.freeze([]);
 
@@ -32,6 +33,10 @@ const Favorites = () => {
   const [subTab, setSubTab] = useState("discount"); // discount | alert | expired
   const [manage, setManage] = useState(false);
   const [query, setQuery] = useState("");
+  const debouncedSetQuery = useMemo(() => debounce(setQuery, 300), [setQuery]);
+  useEffect(() => {
+    return () => debouncedSetQuery.cancel?.();
+  }, [debouncedSetQuery]);
 
   // 选择集合（仅管理态使用）
   const [selected, setSelected] = useState(() => new Set());
@@ -103,7 +108,7 @@ const Favorites = () => {
         onToggleManage={handleToggleManage}
       />
       <Tabs value={mainTab} onChange={setMainTab} />
-      <SearchBox value={query} onChange={setQuery} placeholder="搜索折扣爆料" />
+      <SearchBox value={query} onChange={debouncedSetQuery} placeholder="搜索折扣爆料" />
       <SubTabs value={subTab} onChange={setSubTab} />
 
       {empty ? (

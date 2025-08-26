@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft } from "@react-vant/icons";
 import { useNavigate } from "react-router-dom";
 import { fetchSearchSuggestions } from "@/services/search";
+import { debounce } from "@/utils/debounce";
 
 const THEME = "#f04a31";
 const HIST_KEY = "ptc_search_history";
@@ -40,32 +41,38 @@ export default function SearchBar({ keyword = "", onChange, onSubmit, onBack, on
   const [open, setOpen] = useState(false);
   const [suggests, setSuggests] = useState([]);
   const [loading, setLoading] = useState(false);
-  const debounceRef = useRef(null);
+  const fetchSuggestsDebouncedRef = useRef(null);
   const blurTimerRef = useRef(null);
 
-  // 输入变更后 200ms 防抖请求联想词
+  // 输入变更后 300ms 防抖请求联想词
   useEffect(() => {
+    if (!fetchSuggestsDebouncedRef.current) {
+      fetchSuggestsDebouncedRef.current = debounce(async (q) => {
+        setLoading(true);
+        try {
+          const list = await fetchSearchSuggestions(q);
+          setSuggests(list);
+          setOpen(list.length > 0);
+        } finally {
+          setLoading(false);
+        }
+      }, 300);
+    }
     const q = (keyword || "").trim();
-    if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!q) {
       setSuggests([]);
       setOpen(false);
+      fetchSuggestsDebouncedRef.current?.cancel?.();
       return;
     }
-    debounceRef.current = setTimeout(async () => {
-      setLoading(true);
-      try {
-        const list = await fetchSearchSuggestions(q);
-        setSuggests(list);
-        setOpen(list.length > 0);
-      } finally {
-        setLoading(false);
-      }
-    }, 200);
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
+    fetchSuggestsDebouncedRef.current(q);
   }, [keyword]);
+
+  useEffect(() => {
+    return () => {
+      fetchSuggestsDebouncedRef.current?.cancel?.();
+    };
+  }, []);
 
   const handlePick = (kw) => {
     setOpen(false);
