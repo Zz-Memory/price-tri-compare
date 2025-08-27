@@ -6,10 +6,10 @@ import TipHeader from "./components/TipHeader";
 import TipMeta from "./components/TipMeta";
 import TipContent from "./components/TipContent";
 import TipComments from "./components/TipComments";
+import TipAuthor from "./components/TipAuthor";
 import { LikeO, Like, StarO, Star } from "@react-vant/icons";
 
 function getStateArticle(state) {
-  // 兼容多种传参命名
   if (!state) return null;
   return state.data || state.item || state.article || state.tip || null;
 }
@@ -17,7 +17,7 @@ function getStateArticle(state) {
 const TipDetails = () => {
   useTitle("攻略详情");
 
-  const { id } = useParams?.() || {};
+  const { id } = (typeof useParams === "function" ? useParams() : {}) || {};
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -32,7 +32,6 @@ const TipDetails = () => {
 
   useEffect(() => {
     if (!tip && id) {
-      // 兜底：分页查找该 id（mock 5 页）
       let cancelled = false;
       const findById = async () => {
         setLoading(true);
@@ -67,8 +66,7 @@ const TipDetails = () => {
         cancelled = true;
       };
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  }, [id, tip]);
 
   const commentsCount = useMemo(() => (Array.isArray(tip?.comments) ? tip.comments.length : 0), [tip]);
 
@@ -93,28 +91,37 @@ const TipDetails = () => {
         <div className="px-3 py-6 text-center text-sm text-red-500">{error}</div>
       ) : tip ? (
         <>
-          <div className="px-3 py-3">
-            <div className="bg-white rounded-lg shadow-sm p-3">
-              <h1 className="text-[18px] font-bold text-gray-900 leading-6">{tip.title}</h1>
-              <TipMeta
-                brand={tip.brand}
-                product={tip.product}
-                createdAt={tip.createdAt}
-                commentsCount={commentsCount}
-                likes={likeCount}
-                favorites={favCount}
-              />
+          {/* 将作者 + 正文 + 信息区合并为一个卡片 */}
+          <div className="px-3 pt-3">
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="p-3">
+                <TipAuthor name={tip.authorName} avatar={tip.authorAvatar} />
+              </div>
+
+              <TipContent cover={tip.cover} content={tip.content} embedded />
+
+              <div className="px-3 pb-3">
+                <TipMeta
+                  brand={tip.brand}
+                  product={tip.product}
+                  createdAt={tip.createdAt}
+                  commentsCount={commentsCount}
+                  showCounts={false}
+                />
+                <div className="mt-2 text-xs text-gray-500 flex items-center gap-4">
+                  <span className="flex items-center gap-1"><LikeO /> {likeCount}</span>
+                  <span className="flex items-center gap-1"><StarO /> {favCount}</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="px-3">
-            <TipContent cover={tip.cover} content={tip.content} />
-          </div>
-
+          {/* 评论 */}
           <div className="px-3 mt-3">
             <TipComments comments={tip.comments} />
           </div>
 
+          {/* 底部操作栏 */}
           <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-100 px-4 py-2 flex justify-around">
             <button
               onClick={onToggleLike}

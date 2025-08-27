@@ -1,8 +1,8 @@
 import React from "react";
 
-const TipContent = ({ cover, content }) => {
-  return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+const TipContent = ({ cover, content, embedded = false }) => {
+  const Body = () => (
+    <>
       {cover ? (
         <div className="w-full">
           <img
@@ -16,6 +16,16 @@ const TipContent = ({ cover, content }) => {
       <div className="p-3">
         <p className="text-[15px] leading-6 text-gray-800 whitespace-pre-wrap">{content}</p>
       </div>
+    </>
+  );
+
+  if (embedded) {
+    return <Body />;
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      <Body />
     </div>
   );
 };

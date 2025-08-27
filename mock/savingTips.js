@@ -16,17 +16,6 @@ function genAvatar() {
   return Random.image('48x48', bg, fg, 'png', 'user');
 }
 
-// 评论
-function genComments() {
-  const n = Random.integer(2, 5);
-  return Array.from({ length: n }, () => ({
-    id: Random.guid(),
-    avatar: genAvatar(),
-    username: Random.cname(),
-    content: Random.csentence(8, 15),
-  }));
-}
-
 // 关键词池
 const BRANDS = ['苹果','华为','小米','OPPO','vivo','一加','联想','华硕','戴尔','惠普','美的','海尔','格力','索尼','任天堂','耐克','阿迪达斯'];
 const PRODUCTS = ['手机','笔记本','平板','耳机','显示器','路由器','空调','洗衣机','冰箱','运动鞋','电饭煲','空气炸锅'];
@@ -56,29 +45,65 @@ const CONTENT_TPLS = [
 
 function genTitle(brand, product) {
   const t = Random.pick(TITLE_TPLS)(brand, product);
-  // 控制到 5~15 字（大致，中文计数）
   return t.length > 15 ? t.slice(0, 15) : t;
 }
 function genContent(brand, product) {
   const c = Random.pick(CONTENT_TPLS)(brand, product);
-  // 控制到 30~80 字（大致）
   if (c.length < 30) return c + Random.csentence(8, 16);
   if (c.length > 80) return c.slice(0, 80);
   return c;
 }
 
+// 评论模板（结合关键词更自然）
+const COMMENT_TPLS = [
+  (b, p) => `已入手${b}${p}，叠券确实香，等${Random.pick(SCENES)}再下更稳`,
+  (b, p) => `${b}${p}别冲高配，基础款性价比高，等满减+平台券一起上`,
+  (b, p) => `同意，${Random.pick(ACTIONS)}+店铺券，${b}${p}价格能打到位`,
+  (b, p) => `${b}${p}如果有${Random.pick(['教育优惠','以旧换新','会员券'])}再叠更便宜`,
+  (b, p) => `对比历史价很重要，${b}${p}活动前有时会先涨再降`,
+];
+
+function genComments(brand, product) {
+  const n = Random.integer(2, 5);
+  return Array.from({ length: n }, () => ({
+    id: Random.guid(),
+    avatar: genAvatar(),
+    username: Random.cname(),
+    content: Random.pick(COMMENT_TPLS)(brand, product),
+  }));
+}
+
+// 时间范围：2025-01-01 ~ 2025-08-10
+function formatDateTime(date) {
+  const d = new Date(date);
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+function randDateInRange(start, end) {
+  const t = Random.integer(start.getTime(), end.getTime());
+  return formatDateTime(t);
+}
+
 function genArticle() {
   const brand = Random.pick(BRANDS);
   const product = Random.pick(PRODUCTS);
+  const authorName = Random.cname();
+  const authorAvatar = genAvatar();
+  const createdAt = randDateInRange(
+    new Date(2025, 0, 1, 0, 0, 0),
+    new Date(2025, 7, 10, 23, 59, 59)
+  );
   return {
     id: Random.guid(),
     title: genTitle(brand, product),
     cover: genCover(),
     content: genContent(brand, product),
-    comments: genComments(),
+    authorName,
+    authorAvatar,
+    comments: genComments(brand, product),
     likes: Random.integer(0, 100),
     favorites: Random.integer(0, 20),
-    createdAt: Random.datetime('yyyy-MM-dd HH:mm:ss'),
+    createdAt,
     brand,
     product,
   };

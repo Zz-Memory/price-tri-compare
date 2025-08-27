@@ -7,7 +7,7 @@ const TipComments = ({ comments = [] }) => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="px-3 py-2 border-b border-gray-100 text-sm text-gray-900 font-medium">评论</div>
+      <div className="px-3 py-2 border-b border-gray-100 text-base text-gray-900 font-semibold">评论（{comments.length}）</div>
       <ul className="divide-y divide-gray-100">
         {comments.map((c) => (
           <li key={c.id} className="px-3 py-3 flex items-start gap-2">
