@@ -3,9 +3,13 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useTitle from "@/hooks/useTitle";
 import { fetchSavingTips } from "@/services/savingTips";
 import TipHeader from "./components/TipHeader";
+import TipMeta from "./components/TipMeta";
+import TipContent from "./components/TipContent";
 import TipComments from "./components/TipComments";
-import TipCombinedCard from "./components/TipCombinedCard";
-import TipActionsBar from "./components/TipActionsBar";
+import TipAuthor from "./components/TipAuthor";
+import { LikeO, Like, StarO, Star, ShareO, ChatO } from "@react-vant/icons";
+import { useFavoritesStore } from "@/store/favorites";
+import { useUserStore } from "@/store/login";
 
 function getStateArticle(state) {
   if (!state) return null;
@@ -25,8 +29,21 @@ const TipDetails = () => {
 
   const [liked, setLiked] = useState(false);
   const [faved, setFaved] = useState(false);
+
+  // 收藏数持久化
+  const user = useUserStore((s) => s.user);
+  const userKey = user?.id ?? user?.username ?? "guest";
+  const getFavCountPersist = useFavoritesStore((s) => s.getFavCount);
+  const setFavCountPersist = useFavoritesStore((s) => s.setFavCount);
+  const toggleFavItem = useFavoritesStore((s) => s.toggle);
+
+  const initialFavCount = (() => {
+    const stored = getFavCountPersist ? getFavCountPersist(userKey, id) : undefined;
+    const fromTip = tip?.favorites ?? 0;
+    return stored ?? fromTip;
+  })();
+  const [favCount, setFavCount] = useState(initialFavCount);
   const [likeCount, setLikeCount] = useState(() => tip?.likes ?? 0);
-  const [favCount, setFavCount] = useState(() => tip?.favorites ?? 0);
 
   useEffect(() => {
     if (!tip && id) {
@@ -48,7 +65,11 @@ const TipDetails = () => {
             if (found) {
               setTip(found);
               setLikeCount(found.likes ?? 0);
-              setFavCount(found.favorites ?? 0);
+              // 初始化收藏数（若无持久化记录则使用接口值）
+              const stored = getFavCountPersist ? getFavCountPersist(userKey, found.id) : undefined;
+              const initFav = stored ?? (found.favorites ?? 0);
+              setFavCount(initFav);
+              if (stored == null && setFavCountPersist) setFavCountPersist(userKey, found.id, initFav);
             } else {
               setError("未找到该攻略");
             }
@@ -64,7 +85,20 @@ const TipDetails = () => {
         cancelled = true;
       };
     }
-  }, [id, tip]);
+  }, [id, tip, getFavCountPersist, setFavCountPersist]);
+
+  // tip 就绪时，若没有持久化值则写入一份，且同步本地 state
+  useEffect(() => {
+    if (!tip?.id) return;
+    const stored = getFavCountPersist ? getFavCountPersist(userKey, tip.id) : undefined;
+    const base = tip.favorites ?? 0;
+    if (stored == null) {
+      setFavCount(base);
+      if (setFavCountPersist) setFavCountPersist(userKey, tip.id, base);
+    } else {
+      setFavCount(stored);
+    }
+  }, [tip?.id, tip?.favorites, getFavCountPersist, setFavCountPersist]);
 
   const commentsCount = useMemo(() => (Array.isArray(tip?.comments) ? tip.comments.length : 0), [tip]);
   const shareCount = tip?.shares ?? 0;
@@ -72,16 +106,23 @@ const TipDetails = () => {
   const commentsRef = useRef(null);
 
   const onBack = () => navigate(-1);
+
   const onToggleLike = () => {
     setLiked((v) => !v);
     setLikeCount((n) => (liked ? Math.max(0, n - 1) : n + 1));
   };
+
   const onToggleFav = () => {
+    if (!tip) return;
     setFaved((v) => !v);
-    setFavCount((n) => (faved ? Math.max(0, n - 1) : n + 1));
+    const next = faved ? Math.max(0, favCount - 1) : favCount + 1;
+    setFavCount(next);
+    if (setFavCountPersist) setFavCountPersist(userKey, tip.id ?? id, next);
+    if (toggleFavItem) toggleFavItem(tip, userKey);
   };
+
   const onClickCommentInput = () => {
-    if (commentsRef.current) commentsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    // 按需求：点击无反应
   };
   const onClickShare = () => {};
 
@@ -95,32 +136,73 @@ const TipDetails = () => {
         <div className="px-3 py-6 text-center text-sm text-red-500">{error}</div>
       ) : tip ? (
         <>
+          {/* 合并卡片：作者 + 正文 + 信息 */}
           <div className="px-3 pt-3">
-            <TipCombinedCard
-              tip={tip}
-              likeCount={likeCount}
-              favCount={favCount}
-              commentsCount={commentsCount}
-            />
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="p-3">
+                <TipAuthor name={tip.authorName} avatar={tip.authorAvatar} />
+              </div>
+
+              <TipContent cover={tip.cover} content={tip.content} embedded />
+
+              <div className="px-3 pb-3">
+                <TipMeta
+                  brand={tip.brand}
+                  product={tip.product}
+                  createdAt={tip.createdAt}
+                  commentsCount={commentsCount}
+                  showCounts={false}
+                />
+                <div className="mt-2 text-xs text-gray-500 flex items-center gap-4">
+                  <span className="flex items-center gap-1"><LikeO /> {likeCount}</span>
+                  <span className="flex items-center gap-1"><StarO /> {favCount}</span>
+                </div>
+              </div>
+            </div>
           </div>
 
+          {/* 评论 */}
           <div ref={commentsRef} className="px-3 mt-3">
             <TipComments comments={tip.comments} />
           </div>
 
-          <TipActionsBar
-            placeholder="点我发评论"
-            shareCount={shareCount}
-            commentsCount={commentsCount}
-            favCount={favCount}
-            likeCount={likeCount}
-            faved={faved}
-            liked={liked}
-            onClickCommentInput={onClickCommentInput}
-            onClickShare={onClickShare}
-            onToggleFav={onToggleFav}
-            onToggleLike={onToggleLike}
-          />
+          {/* 底部操作栏：输入气泡 + 分享/评论/收藏/点赞（数量在下） */}
+          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100">
+            <div
+              className="max-w-md mx-auto px-3 pt-2 pb-2"
+              style={{ paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 8px)" }}
+            >
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={onClickCommentInput}
+                  className="flex-1 text-left bg-gray-100 text-gray-500 rounded-full px-4 py-2"
+                >
+                  点我发评论
+                </button>
+
+                <div className="flex items-end gap-5">
+                  <button onClick={onClickShare} className="flex flex-col items-center text-gray-600">
+                    <ShareO />
+                    <span className="text-[10px] mt-1 text-gray-500">{shareCount}</span>
+                  </button>
+                  <button onClick={() => commentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} className="flex flex-col items-center text-gray-600">
+                    <ChatO />
+                    <span className="text-[10px] mt-1 text-gray-500">{commentsCount}</span>
+                  </button>
+                  <button onClick={onToggleFav} className="flex flex-col items-center text-gray-600">
+                    {faved ? <Star /> : <StarO />}
+                    <span className="text-[10px] mt-1 text-gray-500">{favCount}</span>
+                  </button>
+                  <button onClick={onToggleLike} className="flex flex-col items-center text-gray-600">
+                    {liked ? <Like /> : <LikeO />}
+                    <span className="text-[10px] mt-1 text-gray-500">{likeCount}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-2 mx-auto h-1 w-32 bg-gray-300 rounded-full" />
+            </div>
+          </div>
         </>
       ) : (
         <div className="px-3 py-6 text-center text-sm text-gray-500">暂无数据</div>

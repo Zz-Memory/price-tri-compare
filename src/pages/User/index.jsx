@@ -1,5 +1,6 @@
 import useTitle from "@/hooks/useTitle";
 import { useUserStore } from "@/store/login";
+import { useFavoritesStore } from "@/store/favorites";
 import HeaderCard from "./components/HeaderCard";
 import StatRow from "./components/StatRow";
 import BlastCenter from "./components/BlastCenter";
@@ -25,6 +26,8 @@ const User = () => {
   useTitle("我的");
   const user = useUserStore((s) => s.user);
   const navigate = useNavigate();
+  const userKey = user?.id ?? user?.username ?? "guest";
+  const favoritesCount = useFavoritesStore((s) => (s.byUser?.[userKey]?.length) || 0);
   const loginOut = useUserStore((s) => s.loginOut);
   const [showLogout, setShowLogout] = useState(false);
   const onLogoutClick = () => setShowLogout(true);
@@ -53,7 +56,7 @@ const User = () => {
       {/* 统计 */}
       <StatRow
         footprints={user?.footprints ?? 0}
-        favorites={user?.favorites ?? 0}
+        favorites={favoritesCount}
         coins={user?.coins ?? 0}
         points={user?.points ?? 0}
         onFavoritesClick={handleFavoritesClick}

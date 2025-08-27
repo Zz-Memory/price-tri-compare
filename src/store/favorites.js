@@ -11,11 +11,34 @@ export const useFavoritesStore = create(
     (set, get) => ({
       byUser: {},
 
+      // 每个用户的收藏数覆盖：{ [userKey]: { [id]: number } }
+      favCountsByUser: {},
+
       // 获取指定用户列表（工具方法，可在组件选择器中使用 s.byUser[userKey] || [] 代替）
       getList: (userKey) => {
         const key = userKey ?? "guest";
         return get().byUser[key] || [];
       },
+
+      // 获取/设置收藏数（按用户+文章维度持久化）
+      getFavCount: (userKey, id) => {
+        const key = userKey ?? "guest";
+        if (id == null) return undefined;
+        const map = get().favCountsByUser[key] || {};
+        return map[id];
+      },
+      setFavCount: (userKey, id, count) =>
+        set((state) => {
+          const key = userKey ?? "guest";
+          if (id == null) return state;
+          const prev = state.favCountsByUser[key] || {};
+          return {
+            favCountsByUser: {
+              ...state.favCountsByUser,
+              [key]: { ...prev, [id]: Math.max(0, Number(count) || 0) },
+            },
+          };
+        }),
 
       add: (item, userKey) =>
         set((state) => {
@@ -59,9 +82,9 @@ export const useFavoritesStore = create(
     }),
     {
       name: "ptc_favorites_by_user",
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({ byUser: state.byUser }),
+      partialize: (state) => ({ byUser: state.byUser, favCountsByUser: state.favCountsByUser }),
     }
   )
 );
