@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { StarO, LikeO } from "@react-vant/icons";
 
 const clamp2 = {
   display: "-webkit-box",
@@ -69,8 +70,8 @@ const TipCard = ({ data }) => {
         ) : null}
 
         <div className="flex justify-between items-center mt-2 text-xs text-gray-500">
-          <span>👍 {art.likes ?? 0}</span>
-          <span>★ {art.favorites ?? 0}</span>
+          <span><StarO  /> {art.favorites ?? 0}</span>
+          <span><LikeO  /> {art.likes ?? 0}</span>
         </div>
       </div>
     </div>
