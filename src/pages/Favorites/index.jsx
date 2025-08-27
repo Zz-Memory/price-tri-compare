@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import useTitle from "@/hooks/useTitle";
 import { useFavoritesStore } from "@/store/favorites";
 import { useUserStore } from "@/store/login";
-import Header from "./components/Header";
+// Header 已移除
 import Tabs from "./components/Tabs";
 import SearchBox from "./components/SearchBox";
 import SubTabs from "./components/SubTabs";
@@ -101,13 +101,8 @@ const Favorites = () => {
 
   return (
     <div className="max-w-md mx-auto min-h-screen bg-gray-100 pb-20">
-      <Header
-        title="我的收藏"
-        manage={manage}
-        onBack={() => navigate(-1)}
-        onToggleManage={handleToggleManage}
-      />
-      <Tabs value={mainTab} onChange={setMainTab} />
+      {/* Header 删除，管理按钮移动到 Tabs 右侧 */}
+      <Tabs value={mainTab} onChange={setMainTab} manage={manage} onToggleManage={handleToggleManage} />
       <SearchBox value={query} onChange={debouncedSetQuery} placeholder="搜索折扣爆料" />
       <SubTabs value={subTab} onChange={setSubTab} />
 
@@ -127,7 +122,6 @@ const Favorites = () => {
           ))}
         </div>
       )}
-
 
       {manage && (
         <ManageBar
