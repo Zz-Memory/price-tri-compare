@@ -6,7 +6,7 @@ const SubTabs = ({ value = "discount", onChange }) => {
   ];
   return (
     <div className="bg-white">
-      <div className="px-3 flex items-center gap-6 h-10 border-b">
+      <div className="px-3 flex items-center gap-6 h-10">
         {items.map((it) => {
           const active = value === it.key;
           return (

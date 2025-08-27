@@ -29,8 +29,8 @@ const Favorites = () => {
   const decFavorites = useUserStore((s) => s.decFavorites);
 
   // UI 状态
-  const [mainTab, setMainTab] = useState("deal"); // all | deal | post
-  const [subTab, setSubTab] = useState("discount"); // discount | alert | expired
+  const [mainTab, setMainTab] = useState("deal"); // deal | post
+  const [subTab, setSubTab] = useState("discount"); // discount | alert | expired（仅 deal 使用）
   const [manage, setManage] = useState(false);
   const [query, setQuery] = useState("");
   const debouncedSetQuery = useMemo(() => debounce(setQuery, 300), [setQuery]);
@@ -41,16 +41,19 @@ const Favorites = () => {
   // 选择集合（仅管理态使用）
   const [selected, setSelected] = useState(() => new Set());
 
-  // 过滤后的列表（当前仅“折扣爆料/折扣”展示）
+  // 过滤：deal 显示非帖子；post 显示帖子
   const filtered = useMemo(() => {
     let list = items;
     if (query.trim()) {
       const q = query.trim().toLowerCase();
       list = list.filter((it) => (it.title || "").toLowerCase().includes(q));
     }
-    if (mainTab !== "deal") return [];
+    if (mainTab === "post") {
+      return list.filter((it) => it.__type === "post");
+    }
+    // 折扣爆料（仅“折扣”子类展示，保持原逻辑）
     if (subTab !== "discount") return [];
-    return list;
+    return list.filter((it) => it.__type !== "post");
   }, [items, query, mainTab, subTab]);
 
   const filteredIds = useMemo(() => filtered.map((it) => it.id), [filtered]);
@@ -103,13 +106,13 @@ const Favorites = () => {
     <div className="max-w-md mx-auto min-h-screen bg-gray-100 pb-20">
       {/* Header 删除，管理按钮移动到 Tabs 右侧 */}
       <Tabs value={mainTab} onChange={setMainTab} manage={manage} onToggleManage={handleToggleManage} />
-      <SearchBox value={query} onChange={debouncedSetQuery} placeholder="搜索折扣爆料" />
-      <SubTabs value={subTab} onChange={setSubTab} />
+      <SearchBox value={query} onChange={debouncedSetQuery} placeholder={mainTab === "post" ? "搜索帖子" : "搜索折扣爆料"} />
+      {mainTab === "deal" && <SubTabs value={subTab} onChange={setSubTab} />}
 
       {empty ? (
         <div className="py-20 text-center text-gray-400">暂无收藏</div>
       ) : (
-        <div className="px-3 space-y-3">
+        <div className="px-3 mt-3 space-y-3">
           {filtered.map((item) => (
             <ListItem
               key={item.id}

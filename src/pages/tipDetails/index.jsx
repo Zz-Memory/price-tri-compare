@@ -112,17 +112,32 @@ const TipDetails = () => {
     setLikeCount((n) => (liked ? Math.max(0, n - 1) : n + 1));
   };
 
+  // 收藏帖子：写入收藏列表，标记为 __type: 'post'，并附带 meta/stats 便于收藏页展示
   const onToggleFav = () => {
     if (!tip) return;
     setFaved((v) => !v);
     const next = faved ? Math.max(0, favCount - 1) : favCount + 1;
     setFavCount(next);
     if (setFavCountPersist) setFavCountPersist(userKey, tip.id ?? id, next);
-    if (toggleFavItem) toggleFavItem(tip, userKey);
+
+    const favItem = {
+      id: tip.id,
+      __type: "post",
+      title: tip.title,
+      cover: tip.cover,
+      priceText: "",
+      meta: {
+        source: tip.brand ? (tip.product ? `${tip.brand}·${tip.product}` : tip.brand) : "攻略",
+        time: tip.createdAt || "",
+      },
+      stats: { comments: commentsCount, likes: likeCount },
+      _raw: tip,
+    };
+    if (toggleFavItem) toggleFavItem(favItem, userKey);
   };
 
   const onClickCommentInput = () => {
-    // 按需求：点击无反应
+    // 点击无反应
   };
   const onClickShare = () => {};
 

@@ -23,7 +23,11 @@ const ListItem = ({
   const handleOpen = () => {
     if (manage) return;
     if (!item?.id) return;
-    navigate(`/product/${item.id}`, { state: { item } });
+    if (item.__type === "post") {
+      navigate(`/tips/${item.id}`, { state: { data: item._raw || item } });
+    } else {
+      navigate(`/product/${item.id}`, { state: { item } });
+    }
   };
 
   const handleRemove = (e) => {
