@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { StarO, LikeO } from "@react-vant/icons";
+import { useNavigate } from "react-router-dom";
 
 const clamp2 = {
   display: "-webkit-box",
@@ -28,9 +29,13 @@ function heightById(id, min = 120, max = 220) {
 const TipCard = ({ data }) => {
   const art = data || {};
   const coverH = useMemo(() => heightById(art.id), [art.id]);
+  const navigate = useNavigate();
+  const handleClick = () => {
+    if (art?.id) navigate(`/tips/${art.id}`, { state: { data: art } });
+  };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div onClick={handleClick} className="bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer">
       {art.cover ? (
         <div style={{ width: "100%", height: coverH, overflow: "hidden" }}>
           <img

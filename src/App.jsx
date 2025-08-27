@@ -17,6 +17,7 @@ import RequireAuth from '@/routes/RequireAuth'
 // 懒加载
 const Home = lazy(() => import('@/pages/Home'))
 const SavingTips = lazy(() => import('@/pages/SavingTips'))
+const TipDetails = lazy(() => import('@/pages/tipDetails'))
 const AIAssistant = lazy(() => import('@/pages/AiAssistant'))
 const Favorites = lazy(() => import('@/pages/Favorites'))
 const User = lazy(() => import('@/pages/User'))
@@ -54,6 +55,7 @@ function App() {
             <Route path="/product/:id" element={<ProductDetails />} />
             <Route path="/login" element={<Login />} />
             <Route path="/todo" element={<Todo />} />
+            <Route path="/tips/:id" element={<TipDetails />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
