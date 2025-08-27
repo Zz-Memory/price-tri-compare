@@ -1,13 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useTitle from "@/hooks/useTitle";
 import { fetchSavingTips } from "@/services/savingTips";
 import TipHeader from "./components/TipHeader";
-import TipMeta from "./components/TipMeta";
-import TipContent from "./components/TipContent";
 import TipComments from "./components/TipComments";
-import TipAuthor from "./components/TipAuthor";
-import { LikeO, Like, StarO, Star } from "@react-vant/icons";
+import TipCombinedCard from "./components/TipCombinedCard";
+import TipActionsBar from "./components/TipActionsBar";
 
 function getStateArticle(state) {
   if (!state) return null;
@@ -69,9 +67,11 @@ const TipDetails = () => {
   }, [id, tip]);
 
   const commentsCount = useMemo(() => (Array.isArray(tip?.comments) ? tip.comments.length : 0), [tip]);
+  const shareCount = tip?.shares ?? 0;
+
+  const commentsRef = useRef(null);
 
   const onBack = () => navigate(-1);
-
   const onToggleLike = () => {
     setLiked((v) => !v);
     setLikeCount((n) => (liked ? Math.max(0, n - 1) : n + 1));
@@ -80,9 +80,13 @@ const TipDetails = () => {
     setFaved((v) => !v);
     setFavCount((n) => (faved ? Math.max(0, n - 1) : n + 1));
   };
+  const onClickCommentInput = () => {
+    if (commentsRef.current) commentsRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  const onClickShare = () => {};
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-gray-100 pb-16">
+    <div className="max-w-md mx-auto min-h-screen bg-gray-100 pb-24">
       <TipHeader title={tip?.title} onBack={onBack} />
 
       {loading ? (
@@ -91,51 +95,32 @@ const TipDetails = () => {
         <div className="px-3 py-6 text-center text-sm text-red-500">{error}</div>
       ) : tip ? (
         <>
-          {/* 将作者 + 正文 + 信息区合并为一个卡片 */}
           <div className="px-3 pt-3">
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div className="p-3">
-                <TipAuthor name={tip.authorName} avatar={tip.authorAvatar} />
-              </div>
-
-              <TipContent cover={tip.cover} content={tip.content} embedded />
-
-              <div className="px-3 pb-3">
-                <TipMeta
-                  brand={tip.brand}
-                  product={tip.product}
-                  createdAt={tip.createdAt}
-                  commentsCount={commentsCount}
-                  showCounts={false}
-                />
-                <div className="mt-2 text-xs text-gray-500 flex items-center gap-4">
-                  <span className="flex items-center gap-1"><LikeO /> {likeCount}</span>
-                  <span className="flex items-center gap-1"><StarO /> {favCount}</span>
-                </div>
-              </div>
-            </div>
+            <TipCombinedCard
+              tip={tip}
+              likeCount={likeCount}
+              favCount={favCount}
+              commentsCount={commentsCount}
+            />
           </div>
 
-          {/* 评论 */}
-          <div className="px-3 mt-3">
+          <div ref={commentsRef} className="px-3 mt-3">
             <TipComments comments={tip.comments} />
           </div>
 
-          {/* 底部操作栏 */}
-          <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-100 px-4 py-2 flex justify-around">
-            <button
-              onClick={onToggleLike}
-              className="flex items-center gap-1 text-sm text-gray-700 px-3 py-2 rounded hover:bg-gray-100 active:bg-gray-200"
-            >
-              {liked ? <Like /> : <LikeO />} {likeCount}
-            </button>
-            <button
-              onClick={onToggleFav}
-              className="flex items-center gap-1 text-sm text-gray-700 px-3 py-2 rounded hover:bg-gray-100 active:bg-gray-200"
-            >
-              {faved ? <Star /> : <StarO />} {favCount}
-            </button>
-          </div>
+          <TipActionsBar
+            placeholder="点我发评论"
+            shareCount={shareCount}
+            commentsCount={commentsCount}
+            favCount={favCount}
+            likeCount={likeCount}
+            faved={faved}
+            liked={liked}
+            onClickCommentInput={onClickCommentInput}
+            onClickShare={onClickShare}
+            onToggleFav={onToggleFav}
+            onToggleLike={onToggleLike}
+          />
         </>
       ) : (
         <div className="px-3 py-6 text-center text-sm text-gray-500">暂无数据</div>
