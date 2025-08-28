@@ -1,5 +1,6 @@
 import SearchBox from '@/components/SearchBox';
 import {Qr} from "@react-vant/icons";
+import { THEME_COLOR } from "@/constants/theme";
 
 /**
  * HomeHeader
@@ -12,7 +13,7 @@ const HomeHeader = () => {
       {/* 顶部：标题区 + 动作按钮 */}
       <div className="flex justify-between items-center mb-2">
         {/* 标题与副标题 */}
-        <div className="text-xl font-bold" style={{ color: '#f04a31' }}>
+        <div className="text-xl font-bold" style={{ color: THEME_COLOR }}>
           货三家{' '}
           <span className="text-sm font-normal text-gray-500">
             中立的导购平台
@@ -21,8 +22,8 @@ const HomeHeader = () => {
 
         {/* 扫码图标 + 领红包 */}
         <div className="flex items-center space-x-2">
-            <Qr style={{ color: '#f04a31' }} />
-          <button className="text-white text-sm px-4 py-1 rounded-full" style={{ backgroundColor: '#f04a31' }}>
+            <Qr style={{ color: THEME_COLOR }} />
+          <button className="text-white text-sm px-4 py-1 rounded-full" style={{ backgroundColor: THEME_COLOR }}>
             领红包
           </button>
         </div>

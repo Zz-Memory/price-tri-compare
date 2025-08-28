@@ -1,3 +1,4 @@
+import { THEME_COLOR } from '@/constants/theme';
 const Tabs = ({ value = "deal", onChange, manage = false, onToggleManage }) => {
   const items = [
     { key: "deal", label: "折扣爆料" },
@@ -16,13 +17,13 @@ const Tabs = ({ value = "deal", onChange, manage = false, onToggleManage }) => {
                 type="button"
                 onClick={() => onChange?.(it.key)}
                 className={`relative text-[16px] px-2 py-1 ${active ? "" : "text-gray-800"}`}
-                style={active ? { color: "#f04a31" } : undefined}
+                style={active ? { color: THEME_COLOR } : undefined}
               >
                 {it.label}
                 {active ? (
                   <span
                     className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-12 h-0.5 rounded-full"
-                    style={{ backgroundColor: "#f04a31" }}
+                    style={{ backgroundColor: THEME_COLOR }}
                   />
                 ) : null}
               </button>
@@ -36,8 +37,8 @@ const Tabs = ({ value = "deal", onChange, manage = false, onToggleManage }) => {
           onClick={onToggleManage}
           className="ml-auto text-sm px-3 py-1 rounded-full border"
           style={{
-            color: "#f04a31",
-            borderColor: "#f04a31",
+            color: THEME_COLOR,
+            borderColor: THEME_COLOR,
             backgroundColor: manage ? "#fff0ed" : "#ffffff",
           }}
         >

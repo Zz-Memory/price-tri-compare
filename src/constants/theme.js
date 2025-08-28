@@ -1,0 +1,1 @@
+export const THEME_COLOR = '#f04a31';

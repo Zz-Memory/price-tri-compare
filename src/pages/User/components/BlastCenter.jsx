@@ -1,4 +1,5 @@
-const BRAND_COLOR = '#f04a31';
+import { THEME_COLOR } from '@/constants/theme';
+const BRAND_COLOR = THEME_COLOR;
 
 function Item({ icon, text, onClick }) {
   return (

@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "@react-vant/icons";
+import { THEME_COLOR } from "@/constants/theme";
 
-const THEME = "#f04a31";
+const THEME = THEME_COLOR;
 
 export default function SearchResult() {
   const navigate = useNavigate();

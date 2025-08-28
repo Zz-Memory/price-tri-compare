@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
+import { THEME_COLOR } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
-const THEME = '#f04a31';
+const THEME = THEME_COLOR;
 
 export default function Todo() {
   const navigate = useNavigate();
@@ -8,8 +10,8 @@ export default function Todo() {
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center gap-3 px-6 text-center bg-white">
       <span
-        className="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold tracking-wider text-[#f04a31] border"
-        style={{ borderColor: THEME }}
+        className="inline-flex items-center rounded-full px-3 py-1 text-xs font-bold tracking-wider border"
+        style={{ borderColor: THEME, color: THEME }}
       >
         TODO
       </span>
@@ -28,8 +30,10 @@ export default function Todo() {
         </button>
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold border text-[#f04a31] hover:bg-[#f04a31]/5"
-          style={{ borderColor: THEME }}
+          className="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold border"
+          style={{ borderColor: THEME, color: THEME, backgroundColor: 'transparent' }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = hexToRgba(THEME, 0.05); }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
         >
           返回上一页
         </button>

@@ -1,13 +1,15 @@
 import { useNavigate } from 'react-router-dom';
+import { THEME_COLOR } from '@/constants/theme';
+import { hexToRgba } from '@/utils/color';
 
-const THEME = '#f04a31';
+const THEME = THEME_COLOR;
 
 export default function NotFound() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center gap-4 px-6 text-center bg-white">
-      <div className="text-[84px] font-extrabold tracking-wider text-[#f04a31] drop-shadow-[0_4px_16px_rgba(240,74,49,0.25)] leading-none">
+      <div className="text-[84px] font-extrabold tracking-wider leading-none" style={{ color: THEME_COLOR, filter: `drop-shadow(0 4px 16px ${hexToRgba(THEME_COLOR, 0.25)})` }}>
         404
       </div>
       <div className="text-2xl font-bold text-gray-900">页面走丢了</div>
@@ -25,8 +27,10 @@ export default function NotFound() {
         </button>
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold border text-[#f04a31] hover:bg-[#f04a31]/5"
-          style={{ borderColor: THEME }}
+          className="inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-semibold border"
+          style={{ borderColor: THEME, color: THEME, backgroundColor: 'transparent' }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = hexToRgba(THEME, 0.05); }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
         >
           返回上一页
         </button>

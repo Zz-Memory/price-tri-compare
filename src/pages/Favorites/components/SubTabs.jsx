@@ -1,3 +1,4 @@
+import { THEME_COLOR } from '@/constants/theme';
 const SubTabs = ({ value = "discount", onChange }) => {
   const items = [
     { key: "discount", label: "折扣" },
@@ -15,13 +16,13 @@ const SubTabs = ({ value = "discount", onChange }) => {
               type="button"
               onClick={() => onChange?.(it.key)}
               className={`relative text-sm ${active ? "" : "text-gray-700"}`}
-              style={active ? { color: "#f04a31" } : undefined}
+              style={active ? { color: THEME_COLOR } : undefined}
             >
               {it.label}
               {active ? (
                 <span
                   className="absolute left-1/2 -bottom-2 -translate-x-1/2 w-8 h-0.5 rounded-full"
-                  style={{ backgroundColor: "#f04a31" }}
+                  style={{ backgroundColor: THEME_COLOR }}
                 />
               ) : null}
             </button>

@@ -4,6 +4,7 @@ import { fetchSavingTips } from "@/services/savingTips";
 import Waterfall from "./components/Waterfall";
 import TipCard from "./components/TipCard";
 import TipSkeleton from "./components/TipSkeleton";
+import { THEME_COLOR } from "@/constants/theme";
 
 const SavingTips = () => {
   useTitle("省钱攻略");
@@ -78,8 +79,8 @@ const SavingTips = () => {
       {/* 分页标签 */}
       <div className="flex bg-white mb-2">
         <div 
-          className={`flex-1 py-3 text-center ${activeTab === 'recommend' ? 'font-medium border-b-2 border-[#f04a31]' : 'text-gray-500'}`}
-          style={{color: activeTab === 'recommend' ? '#f04a31' : ''}}
+          className={`flex-1 py-3 text-center ${activeTab === 'recommend' ? 'font-medium border-b-2' : 'text-gray-500'}`}
+          style={activeTab === 'recommend' ? { color: THEME_COLOR, borderColor: THEME_COLOR } : undefined}
           onClick={() => {
             if (activeTab !== 'recommend') {
               setActiveTab('recommend');
@@ -93,8 +94,8 @@ const SavingTips = () => {
           推荐
         </div>
         <div 
-          className={`flex-1 py-3 text-center ${activeTab === 'follow' ? 'font-medium border-b-2 border-[#f04a31]' : 'text-gray-500'}`}
-          style={{color: activeTab === 'follow' ? '#f04a31' : ''}}
+          className={`flex-1 py-3 text-center ${activeTab === 'follow' ? 'font-medium border-b-2' : 'text-gray-500'}`}
+          style={activeTab === 'follow' ? { color: THEME_COLOR, borderColor: THEME_COLOR } : undefined}
           onClick={() => {
             if (activeTab !== 'follow') {
               setActiveTab('follow');

@@ -3,7 +3,9 @@
  * props:
  * - items: string[] 热门关键词
  * - onClickItem: (kw: string) => void 点击某个热门词
- */
+*/
+import { THEME_COLOR } from "@/constants/theme";
+import { hexToRgba } from "@/utils/color";
 export default function Hot({ items = [], onClickItem, onShuffle }) {
   return (
     <section className="mb-4">
@@ -12,7 +14,8 @@ export default function Hot({ items = [], onClickItem, onShuffle }) {
         <button
           type="button"
           onClick={onShuffle}
-          className="text-xs text-[#f04a31] hover:underline"
+          className="text-xs hover:underline"
+          style={{ color: THEME_COLOR }}
         >
           换一批
         </button>
@@ -23,7 +26,18 @@ export default function Hot({ items = [], onClickItem, onShuffle }) {
             key={kw}
             type="button"
             onClick={() => onClickItem && onClickItem(kw)}
-            className="rounded-full px-3 py-1.5 text-sm border text-[#f04a31] bg-[#f04a31]/5 border-[#f04a31] hover:bg-[#f04a31]/10"
+            className="rounded-full px-3 py-1.5 text-sm border"
+            style={{
+              color: THEME_COLOR,
+              borderColor: THEME_COLOR,
+              backgroundColor: hexToRgba(THEME_COLOR, 0.05),
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = hexToRgba(THEME_COLOR, 0.1);
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = hexToRgba(THEME_COLOR, 0.05);
+            }}
             title={kw}
           >
             {kw}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SEARCH_HINTS } from "@/constants/search";
+import { THEME_COLOR } from "@/constants/theme";
 
 const SearchBox = () => {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ const SearchBox = () => {
         id="search"
         placeholder={placeholder}
         className="w-full pl-9 pr-24 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2"
-        style={{ "--tw-ring-color": "#f04a31", caretColor: "#f04a31" }}
+        style={{ "--tw-ring-color": THEME_COLOR, caretColor: THEME_COLOR }}
         onClick={goSearchOnly}
         readOnly
       />
@@ -50,7 +51,7 @@ const SearchBox = () => {
       <button
         type="button"
         className="absolute right-1 top-1/2 -translate-y-1/2 text-white px-5 py-1.5 rounded-full text-sm"
-        style={{ backgroundColor: "#f04a31" }}
+        style={{ backgroundColor: THEME_COLOR }}
         onClick={goSearchWithHint}
       >
         搜索

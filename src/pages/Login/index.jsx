@@ -6,8 +6,9 @@ import BrandHeader from './components/BrandHeader';
 import CredentialsForm from './components/CredentialsForm';
 import AgreementCheck from './components/AgreementCheck';
 import InlineToast from './components/InlineToast';
+import { THEME_COLOR } from '@/constants/theme';
 
-const BRAND_COLOR = '#f04a31'; // 慢慢买风格橙红
+const BRAND_COLOR = THEME_COLOR; // 慢慢买风格橙红
 
 export default function Login() {
   const navigate = useNavigate();

@@ -2,6 +2,7 @@ import { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { CommentCircleO, ThumbCircleO } from "@react-vant/icons";
 import { SwipeCell, Button } from "react-vant";
+import { THEME_COLOR } from "@/constants/theme";
 
 /**
  * 收藏列表单项
@@ -72,7 +73,7 @@ const ListItem = ({
                   type="checkbox"
                   checked={checked}
                   onChange={(e) => onCheckChange?.(item.id, e.target.checked)}
-                  style={{ accentColor: "#f04a31" }}
+                  style={{ accentColor: THEME_COLOR }}
                 />
               </label>
             ) : (
@@ -92,7 +93,7 @@ const ListItem = ({
                 {item.title || "未知商品"}
               </h3>
               {priceStr ? (
-                <div className="text-[15px] mt-1" style={{ color: "#f04a31" }}>{priceStr}</div>
+                <div className="text-[15px] mt-1" style={{ color: THEME_COLOR }}>{priceStr}</div>
               ) : null}
 
               <div className="flex justify-between items-center text-xs text-gray-500 mt-1">

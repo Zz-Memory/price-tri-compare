@@ -1,6 +1,7 @@
 import { Button } from 'react-vant';
+import { THEME_COLOR } from '@/constants/theme';
 
-const BRAND_COLOR = '#f04a31';
+const BRAND_COLOR = THEME_COLOR;
 
 export default function HeaderCard({ displayName = '用户', onPointsClick }) {
   return (

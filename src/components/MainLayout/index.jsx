@@ -12,6 +12,7 @@ import {
     UserO
 } from '@react-vant/icons'
 import { useEffect, useState } from 'react'
+import { THEME_COLOR } from '@/constants/theme'
 
 // 底部导航栏数据
 const tabs = [
@@ -53,7 +54,7 @@ const MainLayout = () => {
             <div>
                 <Outlet />
             </div>
-            <Tabbar activeColor='#f04a31' value={activeTab} onChange={handleTabChange} fixed>
+            <Tabbar activeColor={THEME_COLOR} value={activeTab} onChange={handleTabChange} fixed>
                 {tabs.map((tab, index) => (
                     <Tabbar.Item key={index} icon={tab.icon}>
                         {tab.title}

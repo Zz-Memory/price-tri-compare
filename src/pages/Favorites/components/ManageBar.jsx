@@ -1,3 +1,4 @@
+import { THEME_COLOR } from '@/constants/theme';
 const ManageBar = ({
   total = 0,
   selectedCount = 0,
@@ -28,7 +29,7 @@ const ManageBar = ({
           }}
           disabled={disableBatch}
           className={`text-sm px-3 py-1 rounded ${disableBatch ? "bg-gray-200 text-gray-400" : "text-white"}`}
-          style={!disableBatch ? { backgroundColor: "#f04a31" } : undefined}
+          style={!disableBatch ? { backgroundColor: THEME_COLOR } : undefined}
         >
           取消收藏{selectedCount > 0 ? `(${selectedCount})` : ""}
         </button>

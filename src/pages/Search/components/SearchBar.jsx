@@ -3,8 +3,8 @@ import { ArrowLeft } from "@react-vant/icons";
 import { useNavigate } from "react-router-dom";
 import { fetchSearchSuggestions } from "@/services/search";
 import { debounce } from "@/utils/debounce";
+import { THEME_COLOR } from "@/constants/theme";
 
-const THEME = "#f04a31";
 const HIST_KEY = "ptc_search_history";
 
 function readHistory() {
@@ -114,7 +114,7 @@ export default function SearchBar({ keyword = "", onChange, onSubmit, onBack, on
             onChange={(e) => onChange && onChange(e.target.value)}
             placeholder="输入商品名称、型号或关键词"
             className="w-full pl-9 pr-24 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2"
-            style={{ "--tw-ring-color": THEME, caretColor: THEME }}
+            style={{ "--tw-ring-color": THEME_COLOR, caretColor: THEME_COLOR }}
             onFocus={() => {
               if (suggests.length) setOpen(true);
             }}
@@ -128,7 +128,7 @@ export default function SearchBar({ keyword = "", onChange, onSubmit, onBack, on
           <button
             type="submit"
             className="absolute right-1 top-1/2 -translate-y-1/2 text-white px-5 py-1.5 rounded-full text-sm"
-            style={{ backgroundColor: THEME }}
+            style={{ backgroundColor: THEME_COLOR }}
           >
             搜索
           </button>
