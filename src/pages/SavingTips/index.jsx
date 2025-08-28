@@ -8,6 +8,7 @@ import TipSkeleton from "./components/TipSkeleton";
 const SavingTips = () => {
   useTitle("省钱攻略");
 
+  const [activeTab, setActiveTab] = useState("recommend"); // 'recommend' 或 'follow'
   const [list, setList] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -73,7 +74,40 @@ const SavingTips = () => {
 
   return (
     <div className="max-w-md mx-auto min-h-screen bg-gray-100 pb-16">
-      <div className="px-3 py-3 text-base font-medium">省钱攻略</div>
+      
+      {/* 分页标签 */}
+      <div className="flex bg-white mb-2">
+        <div 
+          className={`flex-1 py-3 text-center ${activeTab === 'recommend' ? 'font-medium border-b-2 border-[#f04a31]' : 'text-gray-500'}`}
+          style={{color: activeTab === 'recommend' ? '#f04a31' : ''}}
+          onClick={() => {
+            if (activeTab !== 'recommend') {
+              setActiveTab('recommend');
+              setList([]);
+              setPage(1);
+              setHasMore(true);
+              loadPage(1);
+            }
+          }}
+        >
+          推荐
+        </div>
+        <div 
+          className={`flex-1 py-3 text-center ${activeTab === 'follow' ? 'font-medium border-b-2 border-[#f04a31]' : 'text-gray-500'}`}
+          style={{color: activeTab === 'follow' ? '#f04a31' : ''}}
+          onClick={() => {
+            if (activeTab !== 'follow') {
+              setActiveTab('follow');
+              setList([]);
+              setPage(1);
+              setHasMore(true);
+              loadPage(1);
+            }
+          }}
+        >
+          关注
+        </div>
+      </div>
 
       {showSkeleton ? (
         <Waterfall
