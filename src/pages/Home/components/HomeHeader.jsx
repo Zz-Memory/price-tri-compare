@@ -23,7 +23,7 @@ const HomeHeader = () => {
         {/* 扫码图标 + 领红包 */}
         <div className="flex items-center space-x-2">
             <Qr style={{ color: THEME_COLOR }} />
-          <button className="text-white text-sm px-4 py-1 rounded-full" style={{ backgroundColor: THEME_COLOR }}>
+          <button className="text-white text-sm px-4 py-1 rounded-full" style={{ backgroundColor: THEME_COLOR, color: '#fff' }}>
             领红包
           </button>
         </div>

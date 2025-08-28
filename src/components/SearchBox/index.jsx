@@ -51,7 +51,7 @@ const SearchBox = () => {
       <button
         type="button"
         className="absolute right-1 top-1/2 -translate-y-1/2 text-white px-5 py-1.5 rounded-full text-sm"
-        style={{ backgroundColor: THEME_COLOR }}
+        style={{ backgroundColor: THEME_COLOR, color: '#fff' }}
         onClick={goSearchWithHint}
       >
         搜索

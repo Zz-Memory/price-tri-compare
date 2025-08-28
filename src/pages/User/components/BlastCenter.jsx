@@ -1,5 +1,4 @@
 import { THEME_COLOR } from '@/constants/theme';
-const BRAND_COLOR = THEME_COLOR;
 
 function Item({ icon, text, onClick }) {
   return (
@@ -38,7 +37,7 @@ export default function BlastCenter({ onItemClick }) {
           </div>
           <button
             className="px-3 py-1 rounded-full text-white text-xs"
-            style={{ background: BRAND_COLOR }}
+            style={{ background: THEME_COLOR, color: '#fff' }}
             onClick={() => onItemClick?.('task')}
           >
             去看看

@@ -1,7 +1,6 @@
 import { Button } from 'react-vant';
 import { THEME_COLOR } from '@/constants/theme';
 
-const BRAND_COLOR = THEME_COLOR;
 
 export default function HeaderCard({ displayName = '用户', onPointsClick }) {
   return (
@@ -23,7 +22,7 @@ export default function HeaderCard({ displayName = '用户', onPointsClick }) {
             <Button
               size="small"
               round
-              style={{ background: BRAND_COLOR, borderColor: BRAND_COLOR, color: '#fff' }}
+              style={{ background: THEME_COLOR, borderColor: THEME_COLOR, color: '#fff' }}
               onClick={onPointsClick}
             >
               领积分

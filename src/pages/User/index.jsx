@@ -19,7 +19,6 @@ import {
 import { Dialog } from "react-vant";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { THEME_COLOR } from "@/constants/theme";
 
 
 const User = () => {

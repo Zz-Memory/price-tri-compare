@@ -8,7 +8,6 @@ import AgreementCheck from './components/AgreementCheck';
 import InlineToast from './components/InlineToast';
 import { THEME_COLOR } from '@/constants/theme';
 
-const BRAND_COLOR = THEME_COLOR; // 慢慢买风格橙红
 
 export default function Login() {
   const navigate = useNavigate();
@@ -101,7 +100,7 @@ export default function Login() {
       <HeaderClose onBack={goBack} />
 
       <div className="px-8 flex flex-col items-center">
-        <BrandHeader brandColor={BRAND_COLOR} />
+        <BrandHeader brandColor={THEME_COLOR} />
 
         <CredentialsForm
           username={username}
@@ -111,13 +110,13 @@ export default function Login() {
           loading={loading}
           canSubmit={canSubmit}
           onSubmit={onSubmit}
-          brandColor={BRAND_COLOR}
+          brandColor={THEME_COLOR}
         />
 
         <AgreementCheck
           checked={agree}
           onChange={setAgree}
-          brandColor={BRAND_COLOR}
+          brandColor={THEME_COLOR}
         />
       </div>
 

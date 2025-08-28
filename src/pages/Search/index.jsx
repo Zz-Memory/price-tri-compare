@@ -5,9 +5,7 @@ import History from "./components/History";
 import Hot from "./components/Hot";
 import SearchBar from "./components/SearchBar";
 import Toast from "./components/Toast";
-import { THEME_COLOR } from "@/constants/theme";
 
-const THEME = THEME_COLOR;
 const HIST_KEY = "ptc_search_history";
 
 function readHistory() {
