@@ -18,8 +18,7 @@ export default function SearchResult() {
   }, [q]);
 
   const goBack = () => {
-    if (window.history.length > 1) navigate(-1);
-    else navigate("/search");
+    navigate("/search", { replace: true });
   };
 
   return (
