@@ -166,13 +166,8 @@ const TipDetails = () => {
                   brand={tip.brand}
                   product={tip.product}
                   createdAt={tip.createdAt}
-                  commentsCount={commentsCount}
-                  showCounts={false}
                 />
-                <div className="mt-2 text-xs text-gray-500 flex items-center gap-4">
-                  <span className="flex items-center gap-1"><LikeO /> {likeCount}</span>
-                  <span className="flex items-center gap-1"><StarO /> {favCount}</span>
-                </div>
+
               </div>
             </div>
           </div>
@@ -197,19 +192,19 @@ const TipDetails = () => {
                 </button>
 
                 <div className="flex items-end gap-5">
-                  <button onClick={onClickShare} className="flex flex-col items-center text-gray-600">
+                  <button type="button" onClick={onClickShare} className="flex flex-col items-center text-gray-600">
                     <ShareO />
                     <span className="text-[10px] mt-1 text-gray-500">{shareCount}</span>
                   </button>
-                  <button onClick={() => commentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} className="flex flex-col items-center text-gray-600">
+                  <button type="button" onClick={() => commentsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} className="flex flex-col items-center text-gray-600">
                     <ChatO />
                     <span className="text-[10px] mt-1 text-gray-500">{commentsCount}</span>
                   </button>
-                  <button onClick={onToggleFav} className="flex flex-col items-center text-gray-600">
+                  <button type="button" onClick={onToggleFav} className="flex flex-col items-center text-gray-600">
                     <span style={faved ? { color: THEME_COLOR } : undefined}>{faved ? <Star /> : <StarO />}</span>
                     <span className="text-[10px] mt-1 text-gray-500">{favCount}</span>
                   </button>
-                  <button onClick={onToggleLike} className="flex flex-col items-center text-gray-600">
+                  <button type="button" onClick={onToggleLike} className="flex flex-col items-center text-gray-600">
                     <span style={liked ? { color: THEME_COLOR } : undefined}>{liked ? <Like /> : <LikeO />}</span>
                     <span className="text-[10px] mt-1 text-gray-500">{likeCount}</span>
                   </button>

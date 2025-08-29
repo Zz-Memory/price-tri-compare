@@ -1,7 +1,7 @@
 import React from "react";
 
 const TipContent = ({ cover, content, embedded = false }) => {
-  const Body = () => (
+  const body = (
     <>
       {cover ? (
         <div className="w-full">
@@ -20,12 +20,12 @@ const TipContent = ({ cover, content, embedded = false }) => {
   );
 
   if (embedded) {
-    return <Body />;
+    return body;
   }
 
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <Body />
+      {body}
     </div>
   );
 };
