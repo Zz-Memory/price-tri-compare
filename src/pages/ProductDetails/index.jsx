@@ -80,7 +80,7 @@ const ProductDetails = () => {
   return (
     <div className="max-w-md mx-auto bg-gray-100 min-h-screen pb-20">
       {/* 顶部栏 */}
-      <header className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b">
+      <header className="sticky top-0 z-20 bg-white/90 backdrop-blur">
         <div className="h-12 px-3 flex items-center justify-between">
           <button
             onClick={() => navigate(-1)}

@@ -1,4 +1,5 @@
 import { ThumbCircleO, CommentCircleO, StarO,Star,ShareO } from "@react-vant/icons";
+import { THEME_COLOR } from "@/constants/theme";
 
 const BottomBar = ({
   likes = 0,
@@ -11,7 +12,7 @@ const BottomBar = ({
   onDirectLink = () => {},
 }) => {
   return (
-    <footer className="fixed bottom-0 left-0 right-0 bg-white border-t z-30">
+    <footer className="fixed bottom-0 left-0 right-0 bg-white z-30">
       <div className="max-w-md mx-auto px-3 py-2 flex items-center">
         {/* 左侧操作区 */}
         <div className="flex gap-6 text-gray-700">
@@ -31,7 +32,7 @@ const BottomBar = ({
             onClick={onFavorite}
             className="flex flex-col items-center text-xs"
           >
-            <span className={`text-[20px] ${favorited ? "text-orange-500" : ""}`}>
+            <span className="text-[20px]" style={favorited ? { color: THEME_COLOR } : undefined}>
               {favorited ? <Star /> : <StarO />}
             </span>
             <span className="mt-0.5">收藏</span>
@@ -65,7 +66,7 @@ const BottomBar = ({
         <button
           type="button"
           onClick={onDirectLink}
-          className="ml-3 flex-1 bg-orange-500 active:bg-orange-600 text-white py-2 rounded text-base"
+          className="ml-3 flex-1 text-white py-2 rounded text-base active:opacity-90" style={{ backgroundColor: THEME_COLOR, color: '#fff' }}
         >
           直达链接
         </button>
