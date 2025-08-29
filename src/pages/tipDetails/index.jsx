@@ -8,6 +8,7 @@ import TipContent from "./components/TipContent";
 import TipComments from "./components/TipComments";
 import TipAuthor from "./components/TipAuthor";
 import { LikeO, Like, StarO, Star, ShareO, ChatO } from "@react-vant/icons";
+import { THEME_COLOR } from "@/constants/theme";
 import { useFavoritesStore } from "@/store/favorites";
 import { useUserStore } from "@/store/login";
 
@@ -205,11 +206,11 @@ const TipDetails = () => {
                     <span className="text-[10px] mt-1 text-gray-500">{commentsCount}</span>
                   </button>
                   <button onClick={onToggleFav} className="flex flex-col items-center text-gray-600">
-                    {faved ? <Star /> : <StarO />}
+                    <span style={faved ? { color: THEME_COLOR } : undefined}>{faved ? <Star /> : <StarO />}</span>
                     <span className="text-[10px] mt-1 text-gray-500">{favCount}</span>
                   </button>
                   <button onClick={onToggleLike} className="flex flex-col items-center text-gray-600">
-                    {liked ? <Like /> : <LikeO />}
+                    <span style={liked ? { color: THEME_COLOR } : undefined}>{liked ? <Like /> : <LikeO />}</span>
                     <span className="text-[10px] mt-1 text-gray-500">{likeCount}</span>
                   </button>
                 </div>
