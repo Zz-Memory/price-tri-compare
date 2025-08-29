@@ -93,11 +93,7 @@ export default function Search() {
   };
 
   const goBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate("/home");
-    }
+    navigate("/home", { replace: true });
   };
 
   return (
