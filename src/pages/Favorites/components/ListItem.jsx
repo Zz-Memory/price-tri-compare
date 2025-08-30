@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { useNavigate } from "react-router-dom";
-import { CommentCircleO, ThumbCircleO } from "@react-vant/icons";
+import { CommentCircleO, ThumbCircleO, ChatO, LikeO } from "@react-vant/icons";
 import { SwipeCell, Button } from "react-vant";
 import { THEME_COLOR } from "@/constants/theme";
 
@@ -20,6 +20,9 @@ const ListItem = ({
 }) => {
   const navigate = useNavigate();
   const priceStr = item.priceText ? item.priceText : (item.currentPrice ? `${item.currentPrice}元` : "");
+  const isPost = item.__type === "post";
+  const comments = item?.stats?.comments ?? 0;
+  const likes = item?.stats?.likes ?? 0;
 
   const handleOpen = () => {
     if (manage) return;
@@ -101,10 +104,21 @@ const ListItem = ({
                   {item?.meta?.source} | {item?.meta?.time}
                 </span>
                 <span className="flex items-center gap-2">
-                  <span className="text-gray-400"><CommentCircleO /></span>
-                  <span>{item?.stats?.comments ?? 0}</span>
-                  <span className="text-gray-400"><ThumbCircleO /></span>
-                  <span>{item?.stats?.likes ?? 0}</span>
+                  {isPost ? (
+                    <>
+                      <span className="text-gray-400"><ChatO /></span>
+                      <span>{comments}</span>
+                      <span className="text-gray-400"><LikeO /></span>
+                      <span>{likes}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-gray-400"><CommentCircleO /></span>
+                      <span>{comments}</span>
+                      <span className="text-gray-400"><ThumbCircleO /></span>
+                      <span>{likes}</span>
+                    </>
+                  )}
                 </span>
               </div>
             </div>
