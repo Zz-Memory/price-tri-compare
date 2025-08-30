@@ -1,8 +1,10 @@
 import { memo } from "react";
 import { useNavigate } from "react-router-dom";
-import { CommentCircleO, ThumbCircleO, ChatO, LikeO } from "@react-vant/icons";
+import { CommentCircleO, ThumbCircleO, ChatO, LikeO, Like } from "@react-vant/icons";
 import { SwipeCell, Button } from "react-vant";
 import { THEME_COLOR } from "@/constants/theme";
+import { useLikesStore } from "@/store/likes";
+import { useUserStore } from "@/store/login";
 
 /**
  * 收藏列表单项
@@ -23,6 +25,10 @@ const ListItem = ({
   const isPost = item.__type === "post";
   const comments = item?.stats?.comments ?? 0;
   const likes = item?.stats?.likes ?? 0;
+  const user = useUserStore((s) => s.user);
+  const userKey = user?.id ?? user?.username ?? "guest";
+  const likedByUserMap = useLikesStore((s) => s.likedByUser);
+  const hasLiked = !!likedByUserMap?.[userKey]?.[item.id];
 
   const handleOpen = () => {
     if (manage) return;
@@ -108,7 +114,7 @@ const ListItem = ({
                     <>
                       <span className="text-gray-400"><ChatO /></span>
                       <span>{comments}</span>
-                      <span className="text-gray-400"><LikeO /></span>
+                      <span className="text-gray-400">{hasLiked ? <Like style={{ color: THEME_COLOR }} /> : <LikeO />}</span>
                       <span>{likes}</span>
                     </>
                   ) : (

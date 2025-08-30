@@ -11,6 +11,7 @@ import { LikeO, Like, StarO, Star, ShareO, ChatO } from "@react-vant/icons";
 import { THEME_COLOR } from "@/constants/theme";
 import { useFavoritesStore } from "@/store/favorites";
 import { useUserStore } from "@/store/login";
+import { useLikesStore } from "@/store/likes";
 
 function getStateArticle(state) {
   if (!state) return null;
@@ -37,6 +38,10 @@ const TipDetails = () => {
   const getFavCountPersist = useFavoritesStore((s) => s.getFavCount);
   const setFavCountPersist = useFavoritesStore((s) => s.setFavCount);
   const toggleFavItem = useFavoritesStore((s) => s.toggle);
+  const favoritesByUser = useFavoritesStore((s) => s.byUser);
+
+  const likedByUserMap = useLikesStore((s) => s.likedByUser);
+  const toggleLikePersist = useLikesStore((s) => s.toggle);
 
   const initialFavCount = (() => {
     const stored = getFavCountPersist ? getFavCountPersist(userKey, id) : undefined;
@@ -101,6 +106,21 @@ const TipDetails = () => {
     }
   }, [tip?.id, tip?.favorites, getFavCountPersist, setFavCountPersist]);
 
+  // 初始化“是否已收藏”（从收藏列表 byUser 推断）
+  useEffect(() => {
+    if (!tip?.id) return;
+    const list = favoritesByUser?.[userKey] || [];
+    const has = list.some((x) => String(x.id) === String(tip.id));
+    setFaved(has);
+  }, [favoritesByUser, userKey, tip?.id]);
+
+  // 初始化“是否已点赞”（从 likes store）
+  useEffect(() => {
+    if (!tip?.id) return;
+    const hasLiked = !!likedByUserMap?.[userKey]?.[tip.id];
+    setLiked(hasLiked);
+  }, [likedByUserMap, userKey, tip?.id]);
+
   const commentsCount = useMemo(() => (Array.isArray(tip?.comments) ? tip.comments.length : 0), [tip]);
   const shareCount = tip?.shares ?? 0;
 
@@ -109,6 +129,8 @@ const TipDetails = () => {
   const onBack = () => navigate(-1);
 
   const onToggleLike = () => {
+    const targetId = tip?.id ?? id;
+    if (toggleLikePersist && targetId != null) toggleLikePersist(targetId, userKey);
     setLiked((v) => !v);
     setLikeCount((n) => (liked ? Math.max(0, n - 1) : n + 1));
   };
