@@ -25,8 +25,9 @@ const TipDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [tip, setTip] = useState(() => getStateArticle(location.state));
-  const [loading, setLoading] = useState(!getStateArticle(location.state) && !!id);
+  const initTipFromState = getStateArticle(location.state?.backState) || getStateArticle(location.state);
+  const [tip, setTip] = useState(() => initTipFromState);
+  const [loading, setLoading] = useState(!initTipFromState && !!id);
   const [error, setError] = useState("");
 
   const [liked, setLiked] = useState(false);
@@ -34,6 +35,7 @@ const TipDetails = () => {
 
   // 收藏数持久化
   const user = useUserStore((s) => s.user);
+  const isLogin = useUserStore((s) => s.isLogin);
   const userKey = user?.id ?? user?.username ?? "guest";
   const getFavCountPersist = useFavoritesStore((s) => s.getFavCount);
   const setFavCountPersist = useFavoritesStore((s) => s.setFavCount);
@@ -129,6 +131,11 @@ const TipDetails = () => {
   const onBack = () => navigate(-1);
 
   const onToggleLike = () => {
+    if (!isLogin) {
+      const from = location.pathname + (location.search || "");
+      navigate("/login", { replace: true, state: { from, backState: { tip } } });
+      return;
+    }
     const targetId = tip?.id ?? id;
     if (toggleLikePersist && targetId != null) toggleLikePersist(targetId, userKey);
     setLiked((v) => !v);
@@ -137,6 +144,11 @@ const TipDetails = () => {
 
   // 收藏帖子：写入收藏列表，标记为 __type: 'post'，并附带 meta/stats 便于收藏页展示
   const onToggleFav = () => {
+    if (!isLogin) {
+      const from = location.pathname + (location.search || "");
+      navigate("/login", { replace: true, state: { from, backState: { tip } } });
+      return;
+    }
     if (!tip) return;
     setFaved((v) => !v);
     const next = faved ? Math.max(0, favCount - 1) : favCount + 1;
