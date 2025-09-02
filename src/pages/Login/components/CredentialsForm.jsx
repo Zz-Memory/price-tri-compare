@@ -20,6 +20,7 @@ export default function CredentialsForm({
             onChange={setUsername}
             placeholder="请输入用户名"
             clearable
+            onKeyDown={(e) => { if (e.key === 'Enter') onSubmit(e); }}
           />
         </Form.Item>
         <Form.Item name="password" rules={[{ required: true }]}>
@@ -29,6 +30,7 @@ export default function CredentialsForm({
             onChange={setPassword}
             placeholder="请输入密码"
             clearable
+            onKeyDown={(e) => { if (e.key === 'Enter') onSubmit(e); }}
           />
         </Form.Item>
         <Button
