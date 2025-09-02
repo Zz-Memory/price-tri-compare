@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import useTitle from "@/hooks/useTitle";
 import { useFavoritesStore } from "@/store/favorites";
 import { useUserStore } from "@/store/login";
@@ -29,14 +29,37 @@ const Favorites = () => {
   const decFavorites = useUserStore((s) => s.decFavorites);
 
   // UI 状态
-  const [mainTab, setMainTab] = useState("deal"); // deal | post
-  const [subTab, setSubTab] = useState("discount"); // discount | alert | expired（仅 deal 使用）
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialMainTab = searchParams.get("tab") === "post" ? "post" : "deal";
+  const initialSubTab = searchParams.get("sub") || "discount";
+  const [mainTab, setMainTab] = useState(initialMainTab); // deal | post
+  const [subTab, setSubTab] = useState(initialSubTab); // discount | alert | expired（仅 deal 使用）
   const [manage, setManage] = useState(false);
   const [query, setQuery] = useState("");
   const debouncedSetQuery = useMemo(() => debounce(setQuery, 300), [setQuery]);
   useEffect(() => {
     return () => debouncedSetQuery.cancel?.();
   }, [debouncedSetQuery]);
+
+  // 将主/子标签同步到 URL 查询参数，便于从详情返回时还原到正确分页
+  useEffect(() => {
+    const curTab = searchParams.get("tab");
+    const curSub = searchParams.get("sub");
+    if (
+      curTab === mainTab &&
+      ((mainTab === "deal" && curSub === subTab) || (mainTab === "post" && curSub === null))
+    ) {
+      return;
+    }
+    const next = new URLSearchParams(searchParams);
+    next.set("tab", mainTab);
+    if (mainTab === "deal") {
+      next.set("sub", subTab);
+    } else {
+      next.delete("sub");
+    }
+    setSearchParams(next, { replace: true });
+  }, [mainTab, subTab, searchParams, setSearchParams]);
 
   // 选择集合（仅管理态使用）
   const [selected, setSelected] = useState(() => new Set());
