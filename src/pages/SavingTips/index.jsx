@@ -5,9 +5,14 @@ import Waterfall from "./components/Waterfall";
 import TipCard from "./components/TipCard";
 import TipSkeleton from "./components/TipSkeleton";
 import { THEME_COLOR } from "@/constants/theme";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useUserStore } from "@/store/login";
 
 const SavingTips = () => {
   useTitle("省钱攻略");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isLogin = useUserStore((s) => s.isLogin);
 
   const [activeTab, setActiveTab] = useState("recommend"); // 'recommend' 或 'follow'
   const [list, setList] = useState([]);
@@ -40,6 +45,20 @@ const SavingTips = () => {
     loadPage(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // 根据 URL 查询参数同步激活的标签（用于登录后返回定位“关注”）
+  useEffect(() => {
+    const params = new URLSearchParams(location.search || "");
+    const tab = params.get("tab") || "recommend";
+    if (tab !== activeTab) {
+      setActiveTab(tab);
+      setList([]);
+      setPage(1);
+      setHasMore(true);
+      loadPage(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
 
   useEffect(() => {
     const el = bottomRef.current;
@@ -88,6 +107,7 @@ const SavingTips = () => {
               setPage(1);
               setHasMore(true);
               loadPage(1);
+              navigate(`${location.pathname}?tab=recommend`);
             }
           }}
         >
@@ -98,11 +118,16 @@ const SavingTips = () => {
           style={activeTab === 'follow' ? { color: THEME_COLOR, borderColor: THEME_COLOR } : undefined}
           onClick={() => {
             if (activeTab !== 'follow') {
+              if (!isLogin) {
+                navigate("/login", { replace: true, state: { from: `${location.pathname}?tab=follow` } });
+                return;
+              }
               setActiveTab('follow');
               setList([]);
               setPage(1);
               setHasMore(true);
               loadPage(1);
+              navigate(`${location.pathname}?tab=follow`);
             }
           }}
         >
