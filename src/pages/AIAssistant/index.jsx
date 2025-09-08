@@ -17,6 +17,8 @@ const AIAssistant = () => {
   const inputRef = useRef(null);
   const aiIndexRef = useRef(-1);
   const listRef = useRef(null);
+  const selectedAnswerRef = useRef(null);
+  const lastAnswersRef = useRef({ a1: "", a2: "", a3: "" });
 
   useEffect(() => {
     const el = listRef.current;
@@ -46,6 +48,10 @@ const AIAssistant = () => {
     });
     setInput("");
     setLoading(true);
+
+    // 重置本轮的目标答案键，确保仅显示本轮有内容的 answerX
+    selectedAnswerRef.current = null;
+    lastAnswersRef.current = { a1: "", a2: "", a3: "" };
 
     try {
       const parameters = { input: text }; // 如果工作流入参不是 input，请改这里
@@ -100,25 +106,103 @@ const AIAssistant = () => {
 
             try {
               const obj = JSON.parse(dataStr);
-              const delta =
-                obj?.delta ??
-                obj?.data?.delta ??
-                obj?.data?.content ??
-                obj?.data?.answer ??
-                obj?.content ??
-                obj?.answer ??
-                obj?.text ??
-                obj?.data?.output ??
-                obj?.output ??
+
+              // 解析候选名称（如果事件里标注了输出变量名）
+              const rawName = (obj?.name || obj?.data?.name || obj?.key || obj?.data?.key || "").toString();
+              const name = rawName.toLowerCase();
+
+              // 解析 delta 文本（流式增量）——兼容字符串或 {content:""} 结构
+              const asStr = (v) => (typeof v === "string" ? v : "");
+              const fromDelta = (d) =>
+                typeof d === "string"
+                  ? d
+                  : d && typeof d === "object"
+                  ? asStr(d.content)
+                  : "";
+              const deltaText =
+                fromDelta(obj?.delta) ||
+                fromDelta(obj?.data?.delta) ||
+                asStr(obj?.data?.content) ||
+                asStr(obj?.content) ||
+                asStr(obj?.text) ||
+                asStr(obj?.data?.answer) ||
+                asStr(obj?.answer) ||
                 "";
 
-              if (delta) {
-                acc += String(delta);
+              // 尝试从输出结构中拿到 answer1/2/3（有些事件可能携带完整/部分内容）
+              let outObj = obj?.output ?? obj?.data?.output ?? null;
+              if (typeof outObj === "string") {
+                try { outObj = JSON.parse(outObj); } catch { outObj = null; }
+              }
+              const pick = (src, k) => (src && typeof src === "object" && typeof src[k] === "string" ? src[k] : "");
+              const a1 =
+                pick(obj, "answer1") || pick(obj?.data, "answer1") || pick(outObj, "answer1");
+              const a2 =
+                pick(obj, "answer2") || pick(obj?.data, "answer2") || pick(outObj, "answer2");
+              const a3 =
+                pick(obj, "answer3") || pick(obj?.data, "answer3") || pick(outObj, "answer3");
+
+              // 记录流中出现过的候选答案，便于流结束时兜底
+              if ((a1 && a1.trim()) || (a2 && a2.trim()) || (a3 && a3.trim())) {
+                const prev = lastAnswersRef.current || {};
+                lastAnswersRef.current = {
+                  a1: a1?.trim() ? a1 : prev.a1 || "",
+                  a2: a2?.trim() ? a2 : prev.a2 || "",
+                  a3: a3?.trim() ? a3 : prev.a3 || "",
+                };
+              }
+
+              // 首次锁定有效答案键：优先从事件名判断，其次从出现的非空 answerX 判断
+              if (!selectedAnswerRef.current) {
+                if (["answer1", "answer2", "answer3"].includes(name)) {
+                  selectedAnswerRef.current = name;
+                } else if (a1?.trim()) {
+                  selectedAnswerRef.current = "answer1";
+                } else if (a2?.trim()) {
+                  selectedAnswerRef.current = "answer2";
+                } else if (a3?.trim()) {
+                  selectedAnswerRef.current = "answer3";
+                }
+              }
+
+              // 只显示三个回答里非空的那个：优先取 answer1/2/3 中第一个非空
+              const display = [a1, a2, a3].find(v => typeof v === "string" && v.trim());
+              if (display !== undefined) {
                 const idx = aiIndexRef.current;
                 if (idx >= 0) {
                   setMessages((prev) => {
                     const next = [...prev];
-                    next[idx] = { ...next[idx], content: acc };
+                    next[idx] = { ...next[idx], content: display.trim() };
+                    return next;
+                  });
+                }
+              } else if (deltaText) {
+                // 没有 answer 快照时，优先尝试把增量解析为 {answer1/2/3}，只显示非空的那个；否则再当普通文本追加
+                let picked = null;
+                try {
+                  const maybe = JSON.parse(deltaText);
+                  if (typeof maybe === "string") {
+                    try {
+                      const maybe2 = JSON.parse(maybe);
+                      if (maybe2 && typeof maybe2 === "object") {
+                        const arr = [maybe2.answer1, maybe2.answer2, maybe2.answer3];
+                        picked = arr.find(v => typeof v === "string" && v.trim());
+                      }
+                    } catch {}
+                  } else if (maybe && typeof maybe === "object") {
+                    const arr = [maybe.answer1, maybe.answer2, maybe.answer3];
+                    picked = arr.find(v => typeof v === "string" && v.trim());
+                  }
+                } catch {}
+                const idx = aiIndexRef.current;
+                if (idx >= 0) {
+                  setMessages((prev) => {
+                    const next = [...prev];
+                    if (picked) {
+                      next[idx] = { ...next[idx], content: picked.trim() };
+                    } else {
+                      next[idx] = { ...next[idx], content: (next[idx].content || "") + deltaText };
+                    }
                     return next;
                   });
                 }
@@ -139,6 +223,21 @@ const AIAssistant = () => {
             }
           }
         }
+        // 流结束后，如未累积任何文本，则回退到最后一个非空的 answerX
+        if (!acc.trim()) {
+          const { a1, a2, a3 } = lastAnswersRef.current || {};
+          const fallback = [a1, a2, a3].find(v => typeof v === "string" && v.trim());
+          if (fallback) {
+            const idx = aiIndexRef.current;
+            if (idx >= 0) {
+              setMessages((prev) => {
+                const next = [...prev];
+                next[idx] = { ...next[idx], content: fallback.trim() };
+                return next;
+              });
+            }
+          }
+        }
       } else {
         // 兼容非流式响应（服务端没返回 SSE 时）
         const ret = await res.json().catch(() => null);
@@ -150,12 +249,20 @@ const AIAssistant = () => {
         let reply = "";
         try {
           const data = typeof ret.data === "string" ? JSON.parse(ret.data) : ret.data;
+          const output = typeof data?.output === "string" ? JSON.parse(data.output) : (data?.output || data);
+          const candidates = [
+            output?.answer1,
+            output?.answer2,
+            output?.answer3,
+            data?.answer1,
+            data?.answer2,
+            data?.answer3,
+          ];
           reply =
-            data?.answer ??
-            data?.text ??
-            data?.output ??
-            data?.result ??
-            JSON.stringify(data);
+            candidates.find(v => typeof v === "string" && v.trim()) ||
+            data?.answer ||
+            data?.text ||
+            (typeof data === "object" ? JSON.stringify(data) : String(data ?? ""));
         } catch {
           reply = ret?.data ?? "";
         }
