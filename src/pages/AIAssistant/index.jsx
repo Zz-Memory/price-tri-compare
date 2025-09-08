@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import useTitle from "@/hooks/useTitle";
 import { CHAT_WORKFLOW_URL, CHAT_WORKFLOW_ID } from "@/constants/coze";
+import { THEME_COLOR } from "@/constants/theme";
 
 const AIAssistant = () => {
   useTitle("AI助手");
@@ -291,19 +292,31 @@ const AIAssistant = () => {
   };
 
   return (
-    <div style={{ padding: 16, maxWidth: 720, margin: "0 auto" }}>
-      <h2 style={{ marginBottom: 12 }}>AI Assistant</h2>
-
+    <div
+      style={{
+        padding: 16,
+        maxWidth: 720,
+        margin: "0 auto",
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100dvh",
+        position: "relative",
+        "--tabbar-h": "50px",
+      }}
+    >
       <div
         ref={listRef}
         style={{
           border: "1px solid #eee",
           borderRadius: 8,
           padding: 12,
-          height: 420,
+          flex: 1,
+          minHeight: 0,
           overflowY: "auto",
+          overflowX: "hidden",
           background: "#fafafa",
           marginBottom: 12,
+          userSelect: "text",
         }}
       >
         {messages.map((m, i) => (
@@ -321,7 +334,10 @@ const AIAssistant = () => {
                 padding: "8px 10px",
                 borderRadius: 8,
                 whiteSpace: "pre-wrap",
-                background: m.role === "user" ? "#1677ff" : "#fff",
+                overflowWrap: "anywhere",
+                wordBreak: "break-word",
+                userSelect: "text",
+                background: m.role === "user" ? THEME_COLOR : "#fff",
                 color: m.role === "user" ? "#fff" : "#333",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
               }}
@@ -339,7 +355,18 @@ const AIAssistant = () => {
         <div style={{ color: "crimson", marginBottom: 8 }}>{errMsg}</div>
       )}
 
-      <div style={{ display: "flex", gap: 8 }}>
+      <div
+        style={{
+          position: "sticky",
+          bottom: "calc(var(--tabbar-h) + env(safe-area-inset-bottom))",
+          background: "#fff",
+          padding: "8px 0",
+          display: "flex",
+          gap: 8,
+          zIndex: 5,
+          borderTop: "1px solid #eee",
+        }}
+      >
         <textarea
           ref={inputRef}
           value={input}
@@ -361,7 +388,7 @@ const AIAssistant = () => {
           style={{
             minWidth: 88,
             border: "none",
-            background: loading || !input.trim() ? "#ccc" : "#1677ff",
+            background: loading || !input.trim() ? "#ccc" : THEME_COLOR,
             color: "#fff",
             borderRadius: 6,
             cursor: loading || !input.trim() ? "not-allowed" : "pointer",
