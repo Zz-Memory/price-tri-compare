@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import useTitle from "@/hooks/useTitle";
 import { CHAT_WORKFLOW_URL, CHAT_WORKFLOW_ID } from "@/constants/coze";
-import { THEME_COLOR } from "@/constants/theme";
+import MessageList from "./components/MessageList";
+import ChatInput from "./components/ChatInput";
 
 const AIAssistant = () => {
   useTitle("AI助手");
@@ -20,14 +21,29 @@ const AIAssistant = () => {
   const listRef = useRef(null);
   const selectedAnswerRef = useRef(null);
   const lastAnswersRef = useRef({ a1: "", a2: "", a3: "" });
+  const bottomRef = useRef(null);
 
-  useEffect(() => {
+  const scrollToBottom = () => {
     const el = listRef.current;
     if (!el) return;
     requestAnimationFrame(() => {
-      el.scrollTop = el.scrollHeight;
+      if (bottomRef.current) {
+        bottomRef.current.scrollIntoView({ block: "end" });
+      } else {
+        el.scrollTop = el.scrollHeight;
+      }
     });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
   }, [messages, loading]);
+
+  useEffect(() => {
+    const onResize = () => scrollToBottom();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   const appendMessage = (msg) => setMessages((prev) => [...prev, msg]);
 
@@ -304,99 +320,26 @@ const AIAssistant = () => {
         "--tabbar-h": "50px",
       }}
     >
-      <div
-        ref={listRef}
-        style={{
-          border: "1px solid #eee",
-          borderRadius: 8,
-          padding: 12,
-          flex: 1,
-          minHeight: 0,
-          overflowY: "auto",
-          overflowX: "hidden",
-          background: "#fafafa",
-          marginBottom: 12,
-          userSelect: "text",
-        }}
-      >
-        {messages.map((m, i) => (
-          <div
-            key={i}
-            style={{
-              display: "flex",
-              justifyContent: m.role === "user" ? "flex-end" : "flex-start",
-              marginBottom: 8,
-            }}
-          >
-            <div
-              style={{
-                maxWidth: "80%",
-                padding: "8px 10px",
-                borderRadius: 8,
-                whiteSpace: "pre-wrap",
-                overflowWrap: "anywhere",
-                wordBreak: "break-word",
-                userSelect: "text",
-                background: m.role === "user" ? THEME_COLOR : "#fff",
-                color: m.role === "user" ? "#fff" : "#333",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
-              }}
-            >
-              {m.content}
-            </div>
-          </div>
-        ))}
-        {loading && (
-          <div style={{ color: "#999", fontSize: 12 }}>对方正在输入…</div>
-        )}
-      </div>
+      <MessageList
+        messages={messages}
+        loading={loading}
+        listRef={listRef}
+        bottomRef={bottomRef}
+      />
 
       {errMsg && (
         <div style={{ color: "crimson", marginBottom: 8 }}>{errMsg}</div>
       )}
 
-      <div
-        style={{
-          position: "sticky",
-          bottom: "calc(var(--tabbar-h) + env(safe-area-inset-bottom))",
-          background: "#fff",
-          padding: "8px 0",
-          display: "flex",
-          gap: 8,
-          zIndex: 5,
-          borderTop: "1px solid #eee",
-        }}
-      >
-        <textarea
-          ref={inputRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={onKeyDown}
-          rows={2}
-          placeholder="请输入内容，回车发送（Shift+Enter 换行）"
-          style={{
-            flex: 1,
-            resize: "none",
-            padding: 8,
-            borderRadius: 6,
-            border: "1px solid #ddd",
-          }}
-        />
-        <button
-          onClick={handleSend}
-          disabled={loading || !input.trim()}
-          style={{
-            minWidth: 88,
-            border: "none",
-            background: loading || !input.trim() ? "#ccc" : THEME_COLOR,
-            color: "#fff",
-            borderRadius: 6,
-            cursor: loading || !input.trim() ? "not-allowed" : "pointer",
-          }}
-        >
-          发送
-        </button>
-      </div>
+      <ChatInput
+        input={input}
+        setInput={setInput}
+        handleSend={handleSend}
+        loading={loading}
+        onKeyDown={onKeyDown}
+        inputRef={inputRef}
+        onFocusScroll={scrollToBottom}
+      />
     </div>
   );
 };
