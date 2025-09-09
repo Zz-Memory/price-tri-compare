@@ -157,11 +157,14 @@ pnpm install jsonwebtoken  # 用于生成和验证JWT令牌
 # React专用图表库
 pnpm install recharts
 
+# 渲染md文本
+pnpm install react-markdown remark-gfm
+
 # Tailwind CSS 原子化CSS
 pnpm install tailwindcss @tailwindcss/vite
 
 # 一次安装
-pnpm install react-router-dom react-vant zustand axios vite-plugin-mock mockjs jsonwebtoken recharts tailwindcss @tailwindcss/vite @react-vant/icons
+pnpm install react-router-dom react-vant zustand axios vite-plugin-mock mockjs jsonwebtoken recharts tailwindcss @tailwindcss/vite @react-vant/icons react-markdown remark-gfm
 
 ```
 
