@@ -30,6 +30,12 @@ const AIAssistant = () => {
   const CHUNK_MODE = "char"; // "char" | "word" | "sentence"
   const MAX_CHUNK_SIZE = 3; // char 模式下单次输出字符数
 
+  // 动态加速参数：越往后越快
+  const renderStartRef = useRef(0);
+  const ACCEL_START_MS = 160; // 初始较慢
+  const ACCEL_END_MS = 40;    // 最快间隔
+  const ACCEL_DURATION_MS = 4000; // 从慢到快历时（毫秒）
+
   // 将文本 delta 推入缓冲区，等待慢速渲染
   const pushToRenderBuffer = (delta) => {
     if (!delta) return;
@@ -46,9 +52,14 @@ const AIAssistant = () => {
     }
     renderBufferRef.current.push(...parts);
     if (!renderTimerRef.current) {
-      renderTimerRef.current = setInterval(() => {
+      // 记录开始时间，并用自适应 setTimeout 循环调度，逐步加速
+      renderStartRef.current = performance.now();
+      const tick = () => {
         const idx = aiIndexRef.current;
-        if (idx < 0) return;
+        if (idx < 0) {
+          renderTimerRef.current = null;
+          return;
+        }
         const piece = renderBufferRef.current.shift();
         if (piece) {
           setMessages((prev) => {
@@ -56,18 +67,24 @@ const AIAssistant = () => {
             next[idx] = { ...next[idx], content: (next[idx].content || "") + piece };
             return next;
           });
+          // 计算当前应使用的间隔：线性从 ACCEL_START_MS 过渡到 ACCEL_END_MS
+          const elapsed = performance.now() - (renderStartRef.current || performance.now());
+          const ratio = Math.min(1, Math.max(0, elapsed / ACCEL_DURATION_MS));
+          const currentDelay = Math.round(ACCEL_START_MS + (ACCEL_END_MS - ACCEL_START_MS) * ratio);
+          renderTimerRef.current = setTimeout(tick, currentDelay);
         } else {
-          clearInterval(renderTimerRef.current);
           renderTimerRef.current = null;
         }
-      }, RENDER_CHUNK_MS);
+      };
+      renderTimerRef.current = setTimeout(tick, ACCEL_START_MS);
     }
   };
 
   // 立即把剩余缓冲刷到消息中（在结束/报错/卸载时调用）
   const flushRenderBuffer = () => {
     if (renderTimerRef.current) {
-      clearInterval(renderTimerRef.current);
+      // 兼容 setInterval / setTimeout 两种实现
+      clearTimeout(renderTimerRef.current);
       renderTimerRef.current = null;
     }
     const idx = aiIndexRef.current;
@@ -105,6 +122,7 @@ const AIAssistant = () => {
       window.removeEventListener("resize", onResize);
       // 组件卸载时清理并尝试刷掉缓冲
       try { flushRenderBuffer(); } catch {}
+      renderStartRef.current = 0;
     };
   }, []);
 
