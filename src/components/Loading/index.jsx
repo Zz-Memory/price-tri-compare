@@ -1,12 +1,20 @@
 import React from 'react';
+import { THEME_COLOR } from '@/constants/theme';
 
-const Loading = () => {
+const Loading = ({ size = 'md', color = THEME_COLOR }) => {
+  const sizePx = size === 'small' ? 10 : size === 'lg' ? 16 : 14;
+  const dotStyleBase = {
+    width: sizePx,
+    height: sizePx,
+    backgroundColor: color,
+    borderRadius: '9999px',
+  };
   return (
     <div className="flex items-center justify-center h-full w-full">
       <div className="flex space-x-2">
-        <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-        <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-        <div className="w-4 h-4 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+        <div className="animate-bounce" style={{ ...dotStyleBase, animationDelay: '0ms' }} />
+        <div className="animate-bounce" style={{ ...dotStyleBase, animationDelay: '150ms' }} />
+        <div className="animate-bounce" style={{ ...dotStyleBase, animationDelay: '300ms' }} />
       </div>
     </div>
   );
