@@ -11,7 +11,7 @@ const AIAssistant = () => {
 
 
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "你好，我是你的 Coze 工作流助手～" },
+    { role: "assistant", content: "你好，我是你的货三家购物助手～" },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);

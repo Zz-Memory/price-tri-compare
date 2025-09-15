@@ -1,6 +1,7 @@
 import { THEME_COLOR } from '@/constants/theme';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import Loading from '@/components/Loading';
 
 export default function MessageBubble({ role, content }) {
   const isUser = role === 'user';
@@ -33,6 +34,10 @@ export default function MessageBubble({ role, content }) {
       >
         {isUser ? (
           content
+        ) : content === '' ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Loading size="small" />
+          </div>
         ) : (
           <div
             className="ai-markdown"

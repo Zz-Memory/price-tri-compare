@@ -20,7 +20,7 @@ export default function MessageList({ messages, loading, listRef, bottomRef }) {
       {messages.map((m, i) => (
         <MessageBubble key={i} role={m.role} content={m.content} />
       ))}
-      {loading && <div style={{ color: '#999', fontSize: 12 }}>对方正在输入…</div>}
+      {loading && <div style={{ color: '#999', fontSize: 12 }}>AI正在快速思考中...</div>}
       <div ref={bottomRef} />
     </div>
   );
