@@ -23,6 +23,65 @@ const AIAssistant = () => {
   const lastAnswersRef = useRef({ a1: "", a2: "", a3: "" });
   const bottomRef = useRef(null);
 
+  // 慢速流式渲染：缓冲与节流定时器
+  const renderBufferRef = useRef([]); // 增量分片缓冲
+  const renderTimerRef = useRef(null);
+  const RENDER_CHUNK_MS = 120; // 渲染间隔（毫秒），数值越大越慢
+  const CHUNK_MODE = "char"; // "char" | "word" | "sentence"
+  const MAX_CHUNK_SIZE = 3; // char 模式下单次输出字符数
+
+  // 将文本 delta 推入缓冲区，等待慢速渲染
+  const pushToRenderBuffer = (delta) => {
+    if (!delta) return;
+    let parts = [];
+    if (CHUNK_MODE === "sentence") {
+      parts = delta.split(/(?<=[。！？!?])/);
+    } else if (CHUNK_MODE === "word") {
+      parts = delta.split(/(\s+)/).filter(Boolean);
+    } else {
+      const chars = Array.from(delta);
+      for (let i = 0; i < chars.length; i += MAX_CHUNK_SIZE) {
+        parts.push(chars.slice(i, i + MAX_CHUNK_SIZE).join(""));
+      }
+    }
+    renderBufferRef.current.push(...parts);
+    if (!renderTimerRef.current) {
+      renderTimerRef.current = setInterval(() => {
+        const idx = aiIndexRef.current;
+        if (idx < 0) return;
+        const piece = renderBufferRef.current.shift();
+        if (piece) {
+          setMessages((prev) => {
+            const next = [...prev];
+            next[idx] = { ...next[idx], content: (next[idx].content || "") + piece };
+            return next;
+          });
+        } else {
+          clearInterval(renderTimerRef.current);
+          renderTimerRef.current = null;
+        }
+      }, RENDER_CHUNK_MS);
+    }
+  };
+
+  // 立即把剩余缓冲刷到消息中（在结束/报错/卸载时调用）
+  const flushRenderBuffer = () => {
+    if (renderTimerRef.current) {
+      clearInterval(renderTimerRef.current);
+      renderTimerRef.current = null;
+    }
+    const idx = aiIndexRef.current;
+    if (idx >= 0 && renderBufferRef.current.length) {
+      const rest = renderBufferRef.current.join("");
+      renderBufferRef.current = [];
+      setMessages((prev) => {
+        const next = [...prev];
+        next[idx] = { ...next[idx], content: (next[idx].content || "") + rest };
+        return next;
+      });
+    }
+  };
+
   const scrollToBottom = () => {
     const el = listRef.current;
     if (!el) return;
@@ -42,7 +101,11 @@ const AIAssistant = () => {
   useEffect(() => {
     const onResize = () => scrollToBottom();
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      // 组件卸载时清理并尝试刷掉缓冲
+      try { flushRenderBuffer(); } catch {}
+    };
   }, []);
 
   const appendMessage = (msg) => setMessages((prev) => [...prev, msg]);
@@ -189,9 +252,10 @@ const AIAssistant = () => {
                 if (idx >= 0) {
                   setMessages((prev) => {
                     const next = [...prev];
-                    next[idx] = { ...next[idx], content: display.trim() };
+                    next[idx] = { ...next[idx], content: "" };
                     return next;
                   });
+                  pushToRenderBuffer(display.trim());
                 }
               } else if (deltaText) {
                 // 没有 answer 快照时，优先尝试把增量解析为 {answer1/2/3}，只显示非空的那个；否则再当普通文本追加
@@ -213,15 +277,16 @@ const AIAssistant = () => {
                 } catch {}
                 const idx = aiIndexRef.current;
                 if (idx >= 0) {
-                  setMessages((prev) => {
-                    const next = [...prev];
-                    if (picked) {
-                      next[idx] = { ...next[idx], content: picked.trim() };
-                    } else {
-                      next[idx] = { ...next[idx], content: (next[idx].content || "") + deltaText };
-                    }
-                    return next;
-                  });
+                  if (picked) {
+                    setMessages((prev) => {
+                      const next = [...prev];
+                      next[idx] = { ...next[idx], content: "" };
+                      return next;
+                    });
+                    pushToRenderBuffer(picked.trim());
+                  } else {
+                    pushToRenderBuffer(deltaText);
+                  }
                 }
               }
             } catch {
@@ -230,11 +295,7 @@ const AIAssistant = () => {
                 acc += dataStr;
                 const idx = aiIndexRef.current;
                 if (idx >= 0) {
-                  setMessages((prev) => {
-                    const next = [...prev];
-                    next[idx] = { ...next[idx], content: acc };
-                    return next;
-                  });
+                  pushToRenderBuffer(dataStr);
                 }
               }
             }
@@ -245,14 +306,7 @@ const AIAssistant = () => {
           const { a1, a2, a3 } = lastAnswersRef.current || {};
           const fallback = [a1, a2, a3].find(v => typeof v === "string" && v.trim());
           if (fallback) {
-            const idx = aiIndexRef.current;
-            if (idx >= 0) {
-              setMessages((prev) => {
-                const next = [...prev];
-                next[idx] = { ...next[idx], content: fallback.trim() };
-                return next;
-              });
-            }
+            pushToRenderBuffer(fallback.trim());
           }
         }
       } else {
@@ -287,9 +341,10 @@ const AIAssistant = () => {
         if (idx >= 0) {
           setMessages((prev) => {
             const next = [...prev];
-            next[idx] = { ...next[idx], content: String(reply || "").trim() || "（空响应）" };
+            next[idx] = { ...next[idx], content: "" };
             return next;
           });
+          pushToRenderBuffer(String(reply || "").trim() || "（空响应）");
         }
       }
     } catch (e) {
