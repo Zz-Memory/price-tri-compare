@@ -18,7 +18,7 @@ import RequireAuth from '@/routes/RequireAuth'
 const Home = lazy(() => import('@/pages/Home'))
 const SavingTips = lazy(() => import('@/pages/SavingTips'))
 const TipDetails = lazy(() => import('@/pages/tipDetails'))
-const AIAssistant = lazy(() => import('@/pages/AiAssistant'))
+const AIAssistant = lazy(() => import('@/pages/AIAssistant'))
 const Favorites = lazy(() => import('@/pages/Favorites'))
 const User = lazy(() => import('@/pages/User'))
 const Search = lazy(() => import('@/pages/Search'))
