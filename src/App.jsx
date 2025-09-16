@@ -9,7 +9,7 @@ import {
   Navigate
 } from "react-router-dom";
 import './App.css'
-import MainLayout from '@/components/MainLayOut'
+import MainLayout from '@/components/MainLayout'
 import BlankLayout from '@/components/BlankLayout'
 import Loading from '@/components/Loading'
 import RequireAuth from '@/routes/RequireAuth'
