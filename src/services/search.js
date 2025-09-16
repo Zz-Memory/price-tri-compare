@@ -11,7 +11,7 @@ export async function fetchSearchSuggestions(q) {
   const kw = (q || "").trim();
   if (!kw) return [];
   if (isVercel) {
-    // Vercel 前端造数（与 mock/search.js 逻辑一致：5~8 条）
+    // 构造与 mock/search.js 相同的响应包
     const base = [
       `${kw}`,
       `${kw} 最低价`,
@@ -34,15 +34,16 @@ export async function fetchSearchSuggestions(q) {
     const pool = Mock.Random.shuffle(base);
     const count = Mock.Random.integer(5, 8);
     const set = new Set();
-    const out = [];
+    const list = [];
     for (const s of pool) {
       if (!set.has(s)) {
         set.add(s);
-        out.push(s);
+        list.push(s);
       }
-      if (out.length >= count) break;
+      if (list.length >= count) break;
     }
-    return out;
+    const mockResp = { code: 0, message: "ok", data: { list } };
+    return mockResp.data.list; // 与本地解包后一致
   }
   // 本地：命中 vite-plugin-mock
   const { data } = await axios.get("/search/suggest", { params: { q: kw } });

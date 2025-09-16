@@ -9,7 +9,7 @@ export async function fetchHomeRecommendations({
   pageSize = 10,
 }) {
   if (isVercel) {
-    // 与 mock/homeRecommendations.js 结构对齐的最小前端造数
+    // 构造与 mock/homeRecommendations.js 完全一致的响应包，然后与本地一样解包返回 list
     const { Random } = Mock;
     const toMoney = (n) => Number(n.toFixed(2));
     const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
@@ -60,7 +60,12 @@ export async function fetchHomeRecommendations({
       };
     };
     const list = Array.from({ length: pageSize }, item);
-    return list;
+    const mockResp = {
+      code: 0,
+      message: "ok",
+      data: { list, page, pageSize, hasMore: page < 5 }
+    };
+    return mockResp.data.list; // 与本地 axios 解包后的返回一致
   }
   const { data } = await axios.get("/home/recommendations", {
     params: { platform, category, page, pageSize },
