@@ -1,4 +1,5 @@
 import axios from '@/services/config'
+import { isVercel } from "@/services/config";
 
 const SECRET = '!@$@!$#@$abcdefg';
 const enc = new TextEncoder();
@@ -30,13 +31,26 @@ async function signJwtHS256(payload, secret) {
   return `${data}.${signature}`;
 }
 
-export const getUser = () => {
+export const getUser = async () => {
+  if (isVercel) {
+    // 直接从本地存储 token 解码简单返回（演示用途）
+    const token = localStorage.getItem('token') || '';
+    if (!token) return { data: { code: 1, message: 'No token' } };
+    return { data: { code: 0, data: { id: '101', username: 'admin', footprints: 0, favorites: 0, coins: 0, points: 0 } } };
+  }
   return axios.get('/user');
 };
 
 export const doLogin = async ({ username, password }) => {
-  // 仅封装为 JWT，不在本地验证正确性
   const payload = { username, password, ts: Date.now() };
   const token = await signJwtHS256(payload, SECRET);
+  if (isVercel) {
+    // Vercel：前端“假登录”，对齐 mock/login.js 成功返回结构
+    if (username === 'admin' && password === '123456') {
+      localStorage.setItem('token', token);
+      return { data: { code: 200, msg: '登录成功', token, data: { id: '101', username: 'admin', footprints: 0, favorites: 0, coins: 0, points: 0 } } };
+    }
+    return { data: { code: 400, msg: '用户名或密码错误' } };
+  }
   return axios.post('/login', { token });
 };
